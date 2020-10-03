@@ -1,13 +1,13 @@
 package webcrawlers.fotocasa;
 
 import java.net.URISyntaxException;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.Optional;
 import org.apache.http.client.utils.URIBuilder;
 import org.jetbrains.annotations.NotNull;
+import webcrawlers.fotocasa.specification.FotocasaContract;
 import webcrawlers.fotocasa.specification.Home;
 import webcrawling.UrlBuilder;
 import webcrawling.specification.Contract;
@@ -51,26 +51,13 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
             searchTerm,
             zone,
             SEARCH_LISTINGS_ENDPOINT);
-    String minRooms = minimumRooms == 0 ? "" : minimumRooms + "+";
-    String minRestRooms = minimumRestRooms == 0 ? "" : minimumRestRooms + "+";
-    String minPrice =
-        priceRange == null ? "" : Double.toString(priceRange.getLowerBound().getAmount());
-    String maxPrice =
-        priceRange == null ? "" : Double.toString(priceRange.getUpperBound().getAmount());
-    Map<String, String> queryParameters =
-        new HashMap<>(
-            Map.of(
-                MIN_PRICE_ENDPOINT_PARAMETER,
-                minPrice,
-                MAX_PRICE_ENDPOINT_PARAMETER,
-                maxPrice,
-                MIN_ROOMS_ENDPOINT_PARAMETER,
-                minRooms,
-                MIN_RESTROOMS_ENDPOINT_PARAMETER,
-                minRestRooms));
-    queryParameters.keySet().removeIf(key -> queryParameters.get(key).length() == 0);
+    Map<String, String> optionalQueryParameters =
+        generateOptionalQueryParametersMap(priceRange, minimumRooms, minimumRestRooms);
+    optionalQueryParameters
+        .keySet()
+        .removeIf(key -> optionalQueryParameters.get(key).length() == 0);
     URIBuilder urlBuilder = new URIBuilder().setScheme(PROTOCOL).setHost(SITE_HOST).setPath(path);
-    queryParameters.forEach(urlBuilder::addParameter);
+    optionalQueryParameters.forEach(urlBuilder::addParameter);
     String url;
     try {
       url = urlBuilder.build().toString();
@@ -79,33 +66,48 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
           "Failed to build URL with the following components. Path: "
               + path
               + "Query Parans: "
-              + queryParameters);
+              + optionalQueryParameters);
     }
     return url;
   }
 
+  private Map<String, String> generateOptionalQueryParametersMap(
+      PriceRange priceRange, int minimumRooms, int minimumRestRooms) {
+    String minRooms = minimumRooms == 0 ? "" : Integer.toString(minimumRooms);
+    String minRestRooms = minimumRestRooms == 0 ? "" : Integer.toString(minimumRestRooms);
+    String minPrice =
+        priceRange == null ? "" : Integer.toString((int) priceRange.getLowerBound().getAmount());
+    String maxPrice =
+        priceRange == null ? "" : Integer.toString((int) priceRange.getUpperBound().getAmount());
+    Map<String, String> queryParameters = new LinkedHashMap<>(); // Insertion order matters
+    queryParameters.put(MIN_PRICE_ENDPOINT_PARAMETER, minPrice);
+    queryParameters.put(MAX_PRICE_ENDPOINT_PARAMETER, maxPrice);
+    queryParameters.put(MIN_ROOMS_ENDPOINT_PARAMETER, minRooms);
+    queryParameters.put(MIN_RESTROOMS_ENDPOINT_PARAMETER, minRestRooms);
+    return queryParameters;
+  }
+
   /** {@code SearchRealEstateUrlBuilder} builder static inner class. */
   public static final class Builder {
-    private final String zone;
+    private String zone;
     private final String language;
-    private final Contract contract;
+    private Contract contract;
     private final String searchTerm;
     private PriceRange priceRange;
     private Home home;
     private int minimumRooms;
     private int minimumRestRooms;
 
-    public Builder(
-        @NotNull String searchTerm, String zone, @NotNull Locale locale, Contract contract) {
-      this.zone = Optional.ofNullable(zone).orElse("all-zones");
+    public Builder(@NotNull String searchTerm, @NotNull Locale locale) {
+      this.zone = "all-zones";
       try {
         this.language = locale.getLanguage();
       } catch (MissingResourceException missingLangage) {
         throw new IllegalArgumentException("The locale misses a valid language.");
       }
       this.searchTerm = searchTerm;
-      this.contract = contract;
-      this.home = Home.ALL_THE_HOUSES; // default
+      this.contract = FotocasaContract.BUY;
+      this.home = Home.HOMES; // default
     }
 
     /**
@@ -118,6 +120,32 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
     @NotNull
     public Builder withPriceRange(PriceRange priceRange) {
       this.priceRange = priceRange;
+      return this;
+    }
+
+    /**
+     * Sets the {@code zone} and returns a reference to this Builder so that the methods can be
+     * chained together.
+     *
+     * @param zone the {@code zone} to set
+     * @return a reference to this Builder
+     */
+    @NotNull
+    public Builder atZone(String zone) {
+      this.zone = zone.toLowerCase();
+      return this;
+    }
+
+    /**
+     * Sets the {@code contract} and returns a reference to this Builder so that the methods can be
+     * chained together.
+     *
+     * @param contract the {@code contract} to set
+     * @return a reference to this Builder
+     */
+    @NotNull
+    public Builder withContract(Contract contract) {
+      this.contract = contract;
       return this;
     }
 
