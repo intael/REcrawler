@@ -4,7 +4,7 @@ import webcrawling.specification.Contract;
 
 public enum FotocasaContract implements Contract {
   BUY,
-  RENT,
+  RENTAL,
   SHARE,
   HOLYDAY_RENTAL
 }

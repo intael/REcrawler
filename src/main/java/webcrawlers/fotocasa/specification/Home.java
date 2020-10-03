@@ -1,6 +1,7 @@
 package webcrawlers.fotocasa.specification;
 
 public enum Home {
+  HOMES, // All possible categories
   FLATS,
   ALL_THE_HOUSES,
   INTERMEDIATE_FLOOR,

@@ -16,20 +16,19 @@ public class PriceRange {
   private final Price upperBound;
 
   public PriceRange(@NotNull Price lowerBound, @NotNull Price upperBound) {
-    if(lowerBound.getAmount() > upperBound.getAmount()){
-      throw new IllegalArgumentException("Invalid Price Range: The lower bound price is higher than the upper bound price.");
+    if (lowerBound.getAmount() > upperBound.getAmount()) {
+      throw new IllegalArgumentException(
+          "Invalid Price Range: The lower bound price is higher than the upper bound price.");
     }
-    if(!lowerBound.getCurrency().equals(upperBound.getCurrency()))
-      throw new IllegalArgumentException("Invalid Price Range: The upper and lower bound price currencies do not match.");
+    if (!lowerBound.getCurrency().equals(upperBound.getCurrency()))
+      throw new IllegalArgumentException(
+          "Invalid Price Range: The upper and lower bound price currencies do not match.");
     this.lowerBound = lowerBound;
     this.upperBound = upperBound;
   }
 
   @Override
   public String toString() {
-    return "PriceRange{" +
-        "lowerBound=" + lowerBound +
-        ", upperBound=" + upperBound +
-        '}';
+    return "PriceRange{" + "lowerBound=" + lowerBound + ", upperBound=" + upperBound + '}';
   }
 }
