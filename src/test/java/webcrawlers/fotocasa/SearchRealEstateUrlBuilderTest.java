@@ -49,6 +49,13 @@ public class SearchRealEstateUrlBuilderTest {
   }
 
   @Test
+  void builderThrowsIllegalArgExceptionWhenSearchTermIsEmptyString() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> new SearchRealEstateUrlBuilder.Builder("", new Locale("en")));
+  }
+
+  @Test
   void builderRejectsNullOptionalQueryParameters() {
     assertThrows(
         IllegalArgumentException.class,
