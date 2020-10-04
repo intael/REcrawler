@@ -1,6 +1,7 @@
 package webcrawlers.fotocasa;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,5 +46,22 @@ public class SearchRealEstateUrlBuilderTest {
     assertEquals(
         "https://www.fotocasa.es/en/rental/flats/barcelona/sants/l?minPrice=800&maxPrice=2000&minRooms=3&minBathrooms=2",
         instanceWithAllOptionals.buildUrl());
+  }
+
+  @Test
+  void builderRejectsNullOptionalQueryParameters() {
+    assertThrows(
+        IllegalArgumentException.class,
+        () -> new SearchRealEstateUrlBuilder.Builder("barcelona", new Locale("en")).atZone(null));
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new SearchRealEstateUrlBuilder.Builder("barcelona", new Locale("en"))
+                .withContract(null));
+    assertThrows(
+        IllegalArgumentException.class,
+        () ->
+            new SearchRealEstateUrlBuilder.Builder("barcelona", new Locale("en"))
+                .withPriceRange(null));
   }
 }

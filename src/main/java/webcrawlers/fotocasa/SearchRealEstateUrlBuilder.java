@@ -118,7 +118,7 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
      * @return a reference to this Builder
      */
     @NotNull
-    public Builder withPriceRange(PriceRange priceRange) {
+    public Builder withPriceRange(@NotNull PriceRange priceRange) {
       this.priceRange = priceRange;
       return this;
     }
@@ -131,7 +131,7 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
      * @return a reference to this Builder
      */
     @NotNull
-    public Builder atZone(String zone) {
+    public Builder atZone(@NotNull String zone) {
       this.zone = zone.toLowerCase();
       return this;
     }
@@ -144,7 +144,7 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
      * @return a reference to this Builder
      */
     @NotNull
-    public Builder withContract(Contract contract) {
+    public Builder withContract(@NotNull Contract contract) {
       this.contract = contract;
       return this;
     }
@@ -157,7 +157,7 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
      * @return a reference to this Builder
      */
     @NotNull
-    public Builder withHome(Home home) {
+    public Builder withHome(@NotNull Home home) {
       this.home = home;
       return this;
     }
