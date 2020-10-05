@@ -3,9 +3,8 @@ package webcrawling;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
-import realestate.RealEstate;
 
-public interface RealEstateHtmlParser {
+public interface ListingsSearchResultsPageHtmlParser {
 
-  List<RealEstate> parse(@NotNull Document document);
+  List<String> parse(@NotNull Document document);
 }
