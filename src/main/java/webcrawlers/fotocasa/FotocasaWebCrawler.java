@@ -1,9 +1,10 @@
 package webcrawlers.fotocasa;
 
 import java.util.HashSet;
-import java.util.Locale;
 import java.util.Set;
-import webcrawling.HtmlParser;
+import org.jetbrains.annotations.NotNull;
+import webcrawling.ListingsSearchResultsPageHtmlParser;
+import webcrawling.RealEstateHtmlParser;
 import webcrawling.SiteCollector;
 import webcrawling.SiteListingsPage;
 import webcrawling.UrlBuilder;
@@ -14,15 +15,15 @@ public class FotocasaWebCrawler extends WebCrawler {
   private final Set<SiteListingsPage> siteListingPages = new HashSet<>();
 
   public FotocasaWebCrawler(
-      SiteCollector siteCollector,
-      HtmlParser htmlParser,
-      UrlBuilder urlBuilder,
-      Locale locale,
-      CrawlSpecification crawlSpecification) {
+      @NotNull SiteCollector siteCollector,
+      @NotNull RealEstateHtmlParser listingHtmlParser,
+      @NotNull ListingsSearchResultsPageHtmlParser listingPageHtmlParser,
+      @NotNull UrlBuilder urlBuilder,
+      @NotNull CrawlSpecification crawlSpecification) {
     this.siteCollector = siteCollector;
-    this.htmlParser = htmlParser;
+    this.listingHtmlParser = listingHtmlParser;
+    this.listingPageHtmlParser = listingPageHtmlParser;
     this.urlBuilder = urlBuilder;
-    this.locale = locale;
     this.crawlSpecification = crawlSpecification;
   }
 
