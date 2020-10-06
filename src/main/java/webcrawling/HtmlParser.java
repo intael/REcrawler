@@ -4,7 +4,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 
-public interface ListingsSearchResultsPageHtmlParser {
+public interface HtmlParser<T> {
 
-  List<String> parse(@NotNull Document document);
+  List<T> parse(@NotNull Document document);
 }
