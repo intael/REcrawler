@@ -3,8 +3,8 @@ package webcrawlers.fotocasa;
 import java.util.HashSet;
 import java.util.Set;
 import org.jetbrains.annotations.NotNull;
-import webcrawling.ListingsSearchResultsPageHtmlParser;
-import webcrawling.RealEstateHtmlParser;
+import realestate.RealEstate;
+import webcrawling.HtmlParser;
 import webcrawling.SiteCollector;
 import webcrawling.SiteListingsPage;
 import webcrawling.UrlBuilder;
@@ -16,8 +16,8 @@ public class FotocasaWebCrawler extends WebCrawler {
 
   public FotocasaWebCrawler(
       @NotNull SiteCollector siteCollector,
-      @NotNull RealEstateHtmlParser listingHtmlParser,
-      @NotNull ListingsSearchResultsPageHtmlParser listingPageHtmlParser,
+      @NotNull HtmlParser<RealEstate> listingHtmlParser,
+      @NotNull HtmlParser<String> listingPageHtmlParser,
       @NotNull UrlBuilder urlBuilder,
       @NotNull CrawlSpecification crawlSpecification) {
     this.siteCollector = siteCollector;
