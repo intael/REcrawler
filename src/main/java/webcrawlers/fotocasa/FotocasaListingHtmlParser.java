@@ -6,7 +6,7 @@ import org.jsoup.nodes.Document;
 import realestate.RealEstate;
 import webcrawling.HtmlParser;
 
-public class FotocasaListingsHtmlParser implements HtmlParser<RealEstate> {
+public class FotocasaListingHtmlParser implements HtmlParser<RealEstate> {
   @Override
   public List<RealEstate> parse(@NotNull Document document) {
     return null;
