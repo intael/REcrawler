@@ -8,14 +8,16 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 import webcrawling.HtmlParser;
 
-public class FotocasaSearchPaginationHtmlParser implements HtmlParser<URL> {
+public class FotocasaFetchUrlsHtmlParser implements HtmlParser<URL> {
+  private final String cssClassName;
 
-  private static final String LISTINGS_PAGE_HTML_ELEMENTS =
-      "a.sui-LinkBasic.sui-PaginationBasic-link";
+  public FotocasaFetchUrlsHtmlParser(@NotNull String cssClassName) {
+    this.cssClassName = cssClassName;
+  }
 
   @Override
   public List<URL> parse(@NotNull Document document) {
-    Elements linkTags = document.select(LISTINGS_PAGE_HTML_ELEMENTS);
+    Elements linkTags = document.select(cssClassName);
     return linkTags.stream()
         .map((element -> element.attr(HREF_ATTRIBUTE)))
         .map(HtmlParser::deserializeUrl)

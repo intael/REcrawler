@@ -15,19 +15,17 @@ import webcrawling.specification.CrawlSpecification;
 public class FotocasaWebCrawler extends WebCrawler {
   private final Set<SiteListingsPage> siteListingPages = new HashSet<>();
 
-  private final HtmlParser<URL> searchListings;
+  private final HtmlParser<URL> urlHtmlParser;
 
   public FotocasaWebCrawler(
       @NotNull SiteCollector siteCollector,
       @NotNull HtmlParser<RealEstate> listingHtmlParser,
-      @NotNull HtmlParser<URL> searchPagination,
-      @NotNull HtmlParser<URL> searchListings,
+      @NotNull HtmlParser<URL> urlHtmlParser,
       @NotNull UrlBuilder urlBuilder,
       @NotNull CrawlSpecification crawlSpecification) {
     this.siteCollector = siteCollector;
     this.listingHtmlParser = listingHtmlParser;
-    this.listingPageHtmlParser = searchPagination;
-    this.searchListings = searchListings;
+    this.urlHtmlParser = urlHtmlParser;
     this.urlBuilder = urlBuilder;
     this.crawlSpecification = crawlSpecification;
   }
