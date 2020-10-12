@@ -1,6 +1,5 @@
 package webcrawling;
 
-import java.util.Locale;
 import java.util.Set;
 import realestate.RealEstate;
 import webcrawling.specification.CrawlSpecification;
@@ -8,8 +7,8 @@ import webcrawling.specification.CrawlSpecification;
 public abstract class WebCrawler {
 
   protected SiteCollector siteCollector;
-  protected RealEstateHtmlParser listingHtmlParser;
-  protected ListingsSearchResultsPageHtmlParser listingPageHtmlParser;
+  protected HtmlParser<RealEstate> listingHtmlParser;
+  protected HtmlParser<String> listingPageHtmlParser;
   protected UrlBuilder urlBuilder;
   protected CrawlSpecification crawlSpecification;
 
