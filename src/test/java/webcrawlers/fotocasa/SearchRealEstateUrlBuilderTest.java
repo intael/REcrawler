@@ -7,8 +7,8 @@ import java.util.Locale;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import realestate.measures.Price;
-import webcrawlers.fotocasa.specification.FotocasaContract;
-import webcrawlers.fotocasa.specification.Home;
+import webcrawlers.fotocasa.entities.FotocasaContract;
+import webcrawlers.fotocasa.entities.HomeCategory;
 import webcrawling.specification.PriceRange;
 
 public class SearchRealEstateUrlBuilderTest {
@@ -28,7 +28,7 @@ public class SearchRealEstateUrlBuilderTest {
             .withContract(FotocasaContract.RENTAL)
             .withPriceRange(somePriceRange)
             .atZone("Sants")
-            .withHome(Home.FLATS)
+            .withHome(HomeCategory.FLATS)
             .withMinimumRestRooms(2)
             .withMinimumRooms(3)
             .build();

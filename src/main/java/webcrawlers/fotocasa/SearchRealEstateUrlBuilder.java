@@ -7,8 +7,8 @@ import java.util.Map;
 import java.util.MissingResourceException;
 import org.apache.http.client.utils.URIBuilder;
 import org.jetbrains.annotations.NotNull;
-import webcrawlers.fotocasa.specification.FotocasaContract;
-import webcrawlers.fotocasa.specification.Home;
+import webcrawlers.fotocasa.entities.FotocasaContract;
+import webcrawlers.fotocasa.entities.HomeCategory;
 import webcrawling.UrlBuilder;
 import webcrawling.specification.Contract;
 import webcrawling.specification.PriceRange;
@@ -24,7 +24,7 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
   private final String zone;
   private final String language;
   private final PriceRange priceRange;
-  private final Home home;
+  private final HomeCategory homeCategory;
   private final Integer minimumRooms;
   private final Integer minimumRestRooms;
   private final Contract contract;
@@ -34,7 +34,7 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
     zone = builder.zone;
     language = builder.language;
     priceRange = builder.priceRange;
-    home = builder.home;
+    homeCategory = builder.homeCategory;
     minimumRooms = builder.minimumRooms;
     contract = builder.contract;
     searchTerm = builder.searchTerm;
@@ -47,7 +47,7 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
             "/",
             this.language,
             this.contract.toString().toLowerCase(),
-            home.toString().toLowerCase(),
+            homeCategory.toString().toLowerCase(),
             searchTerm,
             zone,
             SEARCH_LISTINGS_ENDPOINT);
@@ -94,7 +94,7 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
     private Contract contract;
     private final String searchTerm;
     private PriceRange priceRange;
-    private Home home;
+    private HomeCategory homeCategory;
     private int minimumRooms;
     private int minimumRestRooms;
 
@@ -109,7 +109,7 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
         throw new IllegalArgumentException("The searchterm argument can not be a 0 length string");
       this.searchTerm = searchTerm;
       this.contract = FotocasaContract.BUY;
-      this.home = Home.HOMES; // default
+      this.homeCategory = HomeCategory.HOMES; // default
     }
 
     /**
@@ -152,15 +152,15 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
     }
 
     /**
-     * Sets the {@code home} and returns a reference to this Builder so that the methods can be
+     * Sets the {@code homeCategory} and returns a reference to this Builder so that the methods can be
      * chained together.
      *
-     * @param home the {@code home} to set
+     * @param homeCategory the {@code homeCategory} to set
      * @return a reference to this Builder
      */
     @NotNull
-    public Builder withHome(@NotNull Home home) {
-      this.home = home;
+    public Builder withHome(@NotNull HomeCategory homeCategory) {
+      this.homeCategory = homeCategory;
       return this;
     }
 
