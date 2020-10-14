@@ -1,4 +1,4 @@
-package webcrawlers.fotocasa.specification;
+package webcrawlers.fotocasa.entities;
 
 public enum Home {
   HOMES, // All possible categories
