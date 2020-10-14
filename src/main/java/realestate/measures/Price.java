@@ -1,8 +1,12 @@
 package realestate.measures;
 
+import lombok.Getter;
+import lombok.ToString;
+
+@ToString
 public class Price {
-  private final double amount;
-  private final String currency; // ISO 4217 currency code
+  @Getter private final double amount;
+  @Getter private final String currency; // ISO 4217 currency code
 
   public Price(double amount, String currency) {
     if (amount < 0) {
@@ -10,13 +14,5 @@ public class Price {
     }
     this.amount = amount;
     this.currency = currency;
-  }
-
-  public double getAmount() {
-    return amount;
-  }
-
-  public String getCurrency() {
-    return currency;
   }
 }
