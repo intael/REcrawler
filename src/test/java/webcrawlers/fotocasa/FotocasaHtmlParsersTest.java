@@ -3,14 +3,8 @@ package webcrawlers.fotocasa;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-<<<<<<< HEAD
 import java.util.ArrayList;
 import java.util.List;
-=======
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
->>>>>>> Add another house page sample for FotocasaListingHtmlParser unit tests
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
