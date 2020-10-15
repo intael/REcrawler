@@ -3,9 +3,8 @@ package webcrawlers.fotocasa;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -21,10 +20,13 @@ class FotocasaHtmlParsersTest {
 
   private static final String LISTINGS_PAGE_SAMPLE_FILENAME =
       "listings-page-sample-2020-10-07.html";
-  private static final String HOUSE_PAGE_SAMPLE_1_FILENAME = "house-page-sample-2020-10-12.html";
-  private static final String HOUSE_PAGE_SAMPLE_2_FILENAME = "house-page-sample-2020-10-15.html";
+  private static final List<String> HOUSE_PAGE_SAMPLES_FILENAMES =
+      List.of(
+          "house-page-sample-2020-10-12.html",
+          "house-page-sample-2020-10-15.html",
+          "house-page-sample-2020-10-15-bis.html");
   private Document listingsSearchResultPageSample;
-  private final Set<Document> housePageSamples = new HashSet<>();
+  private final List<Document> housePageSamples = new ArrayList<>();
   private static final String FOTOCASA_PAGINATION_SEARCH_RESULTS_CSS_CLASS_NAME =
       "a.sui-LinkBasic.sui-PaginationBasic-link";
   private static final String FOTOCASA_LISTINGS_SEARCH_RESULTS_CSS_CLASS_NAME = "a.re-Card-link";
@@ -32,8 +34,9 @@ class FotocasaHtmlParsersTest {
   @BeforeEach
   void setUp() throws IOException {
     this.listingsSearchResultPageSample = readAndParseHtmlFile(LISTINGS_PAGE_SAMPLE_FILENAME);
-    housePageSamples.add(readAndParseHtmlFile(HOUSE_PAGE_SAMPLE_1_FILENAME));
-    housePageSamples.add(readAndParseHtmlFile(HOUSE_PAGE_SAMPLE_2_FILENAME));
+    for (String sample : HOUSE_PAGE_SAMPLES_FILENAMES) {
+      housePageSamples.add(readAndParseHtmlFile(sample));
+    }
   }
 
   @NotNull
@@ -74,13 +77,12 @@ class FotocasaHtmlParsersTest {
   @Test
   void realEstateParserReturnsRealEstateGivenAFotocasaHousePage() {
     HtmlParser<RealEstate> searchListingsParser = new FotocasaListingHtmlParser();
-    for(Document sample: housePageSamples){
+    for (Document sample : housePageSamples) {
       List<RealEstate> realEstates = searchListingsParser.parse(sample);
       Assert.assertEquals(1, realEstates.size());
       FotocasaHome parsedHouse = (FotocasaHome) realEstates.get(0);
       System.out.println(parsedHouse);
       Assert.assertNotNull(parsedHouse);
     }
-
   }
 }
