@@ -6,9 +6,9 @@ import realestate.measures.Surface;
 
 public abstract class RealEstate {
 
-  private String id;
-  private Price price;
-  private Surface surface;
+  protected String id;
+  protected Price price;
+  protected Surface surface;
 
   @Override
   public boolean equals(Object o) {

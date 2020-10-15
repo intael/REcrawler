@@ -1,23 +1,24 @@
 package realestate.measures;
 
+import lombok.ToString;
+
+@ToString
 public class Surface {
 
   private final double amount;
-  private final String unit;
 
-  public Surface(double amount, String unit) {
-    if (amount < 0) {
-      throw new IllegalArgumentException("Surface can not be negative.");
-    }
+  public Surface(double amount) {
+    guard(amount);
     this.amount = amount;
-    this.unit = unit;
+  }
+
+  private void guard(double amount) {
+    if (amount < 0) {
+      throw new IllegalArgumentException("Surface's amount can not be negative.");
+    }
   }
 
   public double getAmount() {
     return amount;
-  }
-
-  public String getUnit() {
-    return unit;
   }
 }

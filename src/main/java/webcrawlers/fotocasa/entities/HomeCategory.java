@@ -1,6 +1,6 @@
-package webcrawlers.fotocasa.specification;
+package webcrawlers.fotocasa.entities;
 
-public enum Home {
+public enum HomeCategory {
   HOMES, // All possible categories
   FLATS,
   ALL_THE_HOUSES,
