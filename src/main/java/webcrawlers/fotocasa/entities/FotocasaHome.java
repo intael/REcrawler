@@ -1,6 +1,5 @@
 package webcrawlers.fotocasa.entities;
 
-import lombok.Getter;
 import lombok.ToString;
 import org.jetbrains.annotations.NotNull;
 import realestate.RealEstate;
@@ -10,25 +9,25 @@ import realestate.measures.Surface;
 @ToString
 public class FotocasaHome extends RealEstate {
 
-  @Getter private final Price price;
-  @Getter private final Surface surface;
-  @Getter private final String description;
-  @Getter private final String title;
-  @Getter private final String agencyName;
-  @Getter private final String agencyReference;
-  @Getter private final String fotocasaReference;
-  @Getter private final Integer numBedrooms;
-  @Getter private final Integer numBathRooms;
-  @Getter private final HomeCategory homeCategory;
-  @Getter private final Boolean hotWater;
-  @Getter private final Boolean heating;
-  @Getter private final String status;
-  @Getter private final String antiquity;
-  @Getter private final String parking;
-  @Getter private final Boolean furnished;
-  @Getter private final String floor;
-  @Getter private final Boolean elevator;
-  @Getter private final String orientation;
+  private final Price price;
+  private final Surface surface;
+  private final String description;
+  private final String title;
+  private final String agencyName;
+  private final String agencyReference;
+  private final String fotocasaReference;
+  private final Integer numBedrooms;
+  private final Integer numBathRooms;
+  private final HomeCategory homeCategory;
+  private final Boolean hotWater;
+  private final Boolean heating;
+  private final String status;
+  private final String antiquity;
+  private final String parking;
+  private final Boolean furnished;
+  private final String floor;
+  private final Boolean elevator;
+  private final String orientation;
 
   public FotocasaHome(
       Price price,
@@ -69,6 +68,82 @@ public class FotocasaHome extends RealEstate {
     this.floor = floor;
     this.elevator = elevator;
     this.orientation = orientation;
+  }
+
+  public Price getPrice() {
+    return price;
+  }
+
+  public Surface getSurface() {
+    return surface;
+  }
+
+  public String getDescription() {
+    return description;
+  }
+
+  public String getTitle() {
+    return title;
+  }
+
+  public String getAgencyName() {
+    return agencyName;
+  }
+
+  public String getAgencyReference() {
+    return agencyReference;
+  }
+
+  public String getFotocasaReference() {
+    return fotocasaReference;
+  }
+
+  public Integer getNumBedrooms() {
+    return numBedrooms;
+  }
+
+  public Integer getNumBathRooms() {
+    return numBathRooms;
+  }
+
+  public HomeCategory getHomeCategory() {
+    return homeCategory;
+  }
+
+  public Boolean getHotWater() {
+    return hotWater;
+  }
+
+  public Boolean getHeating() {
+    return heating;
+  }
+
+  public String getStatus() {
+    return status;
+  }
+
+  public String getAntiquity() {
+    return antiquity;
+  }
+
+  public String getParking() {
+    return parking;
+  }
+
+  public Boolean getFurnished() {
+    return furnished;
+  }
+
+  public String getFloor() {
+    return floor;
+  }
+
+  public Boolean getElevator() {
+    return elevator;
+  }
+
+  public String getOrientation() {
+    return orientation;
   }
 
   private FotocasaHome(Builder builder) {

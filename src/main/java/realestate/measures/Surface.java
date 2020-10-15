@@ -1,17 +1,24 @@
 package realestate.measures;
 
-import lombok.Getter;
 import lombok.ToString;
 
 @ToString
 public class Surface {
 
-  @Getter private final double amount;
+  private final double amount;
 
   public Surface(double amount) {
-    if (amount < 0) {
-      throw new IllegalArgumentException("Surface can not be negative.");
-    }
+    guard(amount);
     this.amount = amount;
+  }
+
+  private void guard(double amount) {
+    if (amount < 0) {
+      throw new IllegalArgumentException("Surface's amount can not be negative.");
+    }
+  }
+
+  public double getAmount() {
+    return amount;
   }
 }
