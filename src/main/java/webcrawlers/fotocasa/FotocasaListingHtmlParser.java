@@ -43,11 +43,20 @@ public class FotocasaListingHtmlParser implements HtmlParser<RealEstate> {
   public List<RealEstate> parse(@NotNull Document document) {
     Elements references = document.select(REFERENCE_CONTAINER_CSS_CLASS_NAME);
     try {
-      Price price = getPrice(document).orElseThrow(RequiredFieldNotFoundException::new);
-      Surface surface = getSurface(document).orElseThrow(RequiredFieldNotFoundException::new);
+      Price price =
+          getPrice(document)
+              .orElseThrow(
+                  () -> new RequiredFieldNotFound("price", PRICE_CONTAINER_CSS_CLASS_NAME));
+      Surface surface =
+          getSurface(document)
+              .orElseThrow(
+                  () -> new RequiredFieldNotFound("surface", SURFACE_SPAN_CSS_CLASS_CRITERIA));
       String fotocasaReference =
           getReference(references, FotocasaHouseId.FOTOCASA_REFERENCE.getHtmlLabelName())
-              .orElseThrow(RequiredFieldNotFoundException::new);
+              .orElseThrow(
+                  () ->
+                      new RequiredFieldNotFound(
+                          "fotocasaReference", REFERENCE_TEXT_CSS_CLASS_NAME));
       return List.of(
           new FotocasaHome.Builder(price, surface, fotocasaReference)
               .withDescription(
@@ -59,8 +68,8 @@ public class FotocasaListingHtmlParser implements HtmlParser<RealEstate> {
                   getReference(references, FotocasaHouseId.AGENCY_REFERENCE.getHtmlLabelName())
                       .orElse(""))
               .build());
-    } catch (RequiredFieldNotFoundException fieldNotFound) {
-      logger.error("Failed to fetch required field.");
+    } catch (RequiredFieldNotFound fieldNotFound) {
+      logger.error(fieldNotFound.getMessage());
       return List.of();
     }
   }
