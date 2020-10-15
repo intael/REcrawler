@@ -105,11 +105,15 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
       } catch (MissingResourceException missingLangage) {
         throw new IllegalArgumentException("The locale misses a valid language.");
       }
-      if(searchTerm.length() == 0)
-        throw new IllegalArgumentException("The searchterm argument can not be a 0 length string");
+      guard(searchTerm);
       this.searchTerm = searchTerm;
       this.contract = FotocasaContract.BUY;
-      this.homeCategory = HomeCategory.HOMES; // default
+      this.homeCategory = HomeCategory.HOMES;
+    }
+
+    private void guard(@NotNull String searchTerm) {
+      if(searchTerm.length() == 0)
+        throw new IllegalArgumentException("The searchterm argument can not be a 0 length string");
     }
 
     /**
