@@ -7,3 +7,17 @@ services:
     entrypoint: ["tail", "-f", "/dev/null"]
     volumes:
       - .:/usr/src/app
+
+  db:
+    container_name: db_scrapper
+    image: mysql:5.7
+    environment:
+      - MYSQL_DATABASE=core
+      - MYSQL_USER=root
+      - MYSQL_ROOT_PASSWORD=passwd
+    ports:
+      - 33069:3306
+    restart: always
+    volumes:
+      - ./docker/mysql:/docker-entrypoint-initdb.d/
+      

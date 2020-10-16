@@ -1,6 +1,7 @@
 .EXPORT_ALL_VARIABLES:
 
 export CONTAINER=core_scrapper
+export DATABASE=db_scrapper
 export ARTIFACT=housing-scraper
 export VERSION=1.0
 
@@ -15,6 +16,10 @@ build:
 .PHONY: compile
 compile:
 	docker exec -ti $(CONTAINER) mvn package
+
+.PHONY: database
+database:
+	docker exec -ti $(DATABASE) mysql -u root -ppasswd -D core
 
 .PHONY: execute
 execute:
