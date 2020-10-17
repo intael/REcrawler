@@ -10,6 +10,7 @@ public abstract class WebCrawler {
   protected SiteCollector siteCollector;
   protected HtmlParser<RealEstate> listingHtmlParser;
   protected HtmlParser<URL> listingPageHtmlParser;
+  protected HtmlParser<URL> searchResultsPagesHtmlParser;
   protected UrlBuilder urlBuilder;
   protected CrawlSpecification crawlSpecification;
 
