@@ -10,8 +10,11 @@ import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -48,8 +51,8 @@ class FotocasaSiteCollectorTest {
     return firstLine;
   }
 
-  private List<String> readAllLinesFromFile(File file) {
-    List<String> addresses = new ArrayList<>();
+  private Set<String> readAllLinesFromFile(File file) {
+    Set<String> addresses = new HashSet<>();
     String line;
     try (BufferedReader buffer = new BufferedReader(new FileReader(file))) {
       while ((line = buffer.readLine()) != null) {
@@ -92,7 +95,7 @@ class FotocasaSiteCollectorTest {
             .toFile();
     Optional<String> userAgent = pickFirstLineFromFile(userAgentsFilePath);
     userAgent.ifPresent(s -> this.exampleUserAgent = s);
-    List<String> proxiAddresses = readAllLinesFromFile(proxyListFilePath);
+    Set<String> proxiAddresses = readAllLinesFromFile(proxyListFilePath);
     this.proxyAddresses =
         proxiAddresses.stream().map(this::createProxyFromString).collect(Collectors.toList());
     this.instanceWithoutProxy = new FotocasaSiteCollector(this.exampleUserAgent);
@@ -115,28 +118,23 @@ class FotocasaSiteCollectorTest {
     int proxies = 100;
     int index = 0;
     final int SUCCESS_CRITERIA = 30;
-    List<Future<Optional<Document>>> futures = new ArrayList<>();
+    List<Callable<Optional<Document>>> callables = new ArrayList<>();
     // TODO: Randomize User Agent used
-    final FotocasaSiteCollector proxiedCollector =
-        new FotocasaSiteCollector(
-            this.exampleUserAgent, null, this.proxyAddresses.get(0), 120_000, 6);
     ExecutorService exec =
         Executors.newFixedThreadPool(
             proxies); // It's a IO bound task, so threads are going to be idling most of the time
     while (index < proxies) {
-      proxiedCollector.setProxy(proxyAddresses.get(index));
-      futures.add(
-          exec.submit(
-              () -> {
-                logger.info("Using proxy: " + proxiedCollector.getProxy().toString());
-                return proxiedCollector.collect(
-                    "https://www.fotocasa.es/en/buy/homes/barcelona/all-zones/l");
-              }));
+      FotocasaSiteCollector collector =
+          new FotocasaSiteCollector(
+              this.exampleUserAgent, null, this.proxyAddresses.get(index), 120_000, 6);
+      callables.add(
+          () -> collector.collect("https://www.fotocasa.es/en/buy/homes/barcelona/all-zones/l"));
       index++;
     }
-    exec.shutdown();
     try {
-      exec.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+      List<Future<Optional<Document>>> futures =
+          exec.invokeAll(callables, Long.MAX_VALUE, TimeUnit.NANOSECONDS);
+      exec.shutdown();
       long successes =
           futures.stream()
               .filter(
