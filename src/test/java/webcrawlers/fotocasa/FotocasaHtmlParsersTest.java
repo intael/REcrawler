@@ -81,7 +81,6 @@ class FotocasaHtmlParsersTest {
       List<RealEstate> realEstates = searchListingsParser.parse(sample);
       Assert.assertEquals(1, realEstates.size());
       FotocasaHome parsedHouse = (FotocasaHome) realEstates.get(0);
-      System.out.println(parsedHouse);
       Assert.assertNotNull(parsedHouse);
     }
   }

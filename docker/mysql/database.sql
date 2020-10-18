@@ -1,5 +1,5 @@
 CREATE TABLE `fotocasa_home` (
-    id VARCHAR(36) NOT NULL UNIQUE PRIMARY KEY,
+    id INTEGER AUTO_INCREMENT NOT NULL UNIQUE PRIMARY KEY,
     price FLOAT NOT NULL,
     currency VARCHAR(3) not null,
     surface FLOAT not null,
