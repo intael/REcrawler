@@ -9,7 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import realestate.RealEstate;
+import webcrawlers.fotocasa.repositories.FotocasaRealEstateMySqlRepository;
 import webcrawling.HtmlParser;
+import webcrawling.RealEstateRepository;
 import webcrawling.UrlBuilder;
 
 class FotocasaWebCrawlerTest {
@@ -51,5 +53,8 @@ class FotocasaWebCrawlerTest {
     Assert.assertTrue(this.instance.getSearchResultsPages().size() > 0);
     Assert.assertTrue(this.instance.getListingPageUrls().size() > 0);
     Assert.assertTrue(this.instance.getCollectedHomes().size() > 0);
+
+    RealEstateRepository repo = new FotocasaRealEstateMySqlRepository();
+    this.instance.getCollectedHomes().forEach(repo::save);
   }
 }
