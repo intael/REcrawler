@@ -19,5 +19,6 @@ CREATE TABLE `fotocasa_home` (
     hot_water TINYINT(1) DEFAULT NULL,
     heating TINYINT(1) DEFAULT NULL,
     furnished TINYINT(1) DEFAULT NULL,
-    elevator TINYINT(1) DEFAULT NULL
+    elevator TINYINT(1) DEFAULT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
