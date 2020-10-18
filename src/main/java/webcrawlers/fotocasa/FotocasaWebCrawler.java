@@ -1,13 +1,20 @@
 package webcrawlers.fotocasa;
 
-import java.io.IOException;
 import java.net.URL;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -22,8 +29,9 @@ public class FotocasaWebCrawler extends WebCrawler {
   private static final Logger LOGGER = LoggerFactory.getLogger(FotocasaWebCrawler.class);
   private static final Pattern SEARCH_RESULTS_URL_INDEX_REGEX = Pattern.compile("[0-9]+$");
   private static final int SEARCH_RESULTS_DEFAULT_RETRY_TIMES = 6;
-  private final Set<URL> listingsPages = new HashSet<>();
   private final Set<URL> searchResultsPages = new HashSet<>();
+  private final Set<URL> listingPageUrls = ConcurrentHashMap.newKeySet();
+  private final Set<RealEstate> collectedHomes = ConcurrentHashMap.newKeySet();
 
   private final HtmlParser<URL> listingsPagesHtmlParser;
 
@@ -31,16 +39,24 @@ public class FotocasaWebCrawler extends WebCrawler {
     return new HashSet<>(searchResultsPages); // defensive copy
   }
 
+  public Set<URL> getListingPageUrls() {
+    return new HashSet<>(listingPageUrls); // defensive copy
+  }
+
+  public Set<RealEstate> getCollectedHomes() {
+    return new HashSet<>(collectedHomes); // defensive copy
+  }
+
   public FotocasaWebCrawler(
       @NotNull SiteCollector siteCollector,
       @NotNull HtmlParser<RealEstate> listingHtmlParser,
       @NotNull HtmlParser<URL> searchResultsPagesHtmlParser,
-      @NotNull HtmlParser<URL> listingsPagesHtmlParser,
+      @NotNull HtmlParser<URL> listingPagesHtmlParser,
       @NotNull UrlBuilder urlBuilder) {
     this.siteCollector = siteCollector;
     this.listingHtmlParser = listingHtmlParser;
     this.searchResultsPagesHtmlParser = searchResultsPagesHtmlParser;
-    this.listingsPagesHtmlParser = listingsPagesHtmlParser;
+    this.listingsPagesHtmlParser = listingPagesHtmlParser;
     this.urlBuilder = urlBuilder;
   }
 
@@ -48,7 +64,8 @@ public class FotocasaWebCrawler extends WebCrawler {
   public void crawl() {
     String searchUrl = urlBuilder.buildUrl();
     Optional<Document> initialSearchResult =
-        fetchDocument(searchUrl, SEARCH_RESULTS_DEFAULT_RETRY_TIMES);
+        new FetchDocumentCallable(searchUrl, siteCollector, SEARCH_RESULTS_DEFAULT_RETRY_TIMES)
+            .call();
     if (initialSearchResult.isEmpty()) {
       LOGGER.error("Failed to even fetch the initial search results page.");
       return;
@@ -59,15 +76,10 @@ public class FotocasaWebCrawler extends WebCrawler {
     } catch (PaginationPageFetchFailure pageFetchFailure) {
       LOGGER.error(pageFetchFailure.getMessage());
     }
-  }
-
-  private Optional<Document> fetchDocument(String url, int retries) {
-    try {
-      return siteCollector.collect(url, retries);
-    } catch (IOException ioe) {
-      LOGGER.error("Failed to fetch document. Exception: " + ioe.toString());
-    }
-    return Optional.empty();
+    collectPagesConcurrently(searchResultsPages, this::getHomePageUrls);
+    LOGGER.info(String.format("Collected %s home pages.", this.listingPageUrls.size()));
+    collectPagesConcurrently(listingPageUrls, this::getHome);
+    LOGGER.info(String.format("Process finished! Collected %s homes.", this.collectedHomes.size()));
   }
 
   private IndexedUrl getPageWithHighestIndex(List<URL> searchResultPages) {
@@ -94,6 +106,7 @@ public class FotocasaWebCrawler extends WebCrawler {
   // TODO: Should we maybe turn this into a separate component to be injected here?
   private void collectSearchResultsPages(Document resultsPage, int globalMaxResultPagesIndex)
       throws PaginationPageFetchFailure {
+    getHomePageUrls(resultsPage);
     List<URL> pages = searchResultsPagesHtmlParser.parse(resultsPage);
     if (pages.size() == 0) {
       LOGGER.info("No additional pages were found.");
@@ -105,11 +118,15 @@ public class FotocasaWebCrawler extends WebCrawler {
       LOGGER.info(
           String.format("End of pagination reached at page %s.", globalMaxResultPagesIndex));
     } else { // recursive case
-      LOGGER.info("Collected up to page: " + highestIndexPage.getIndex());
-      LOGGER.debug("Total pages collected: " + searchResultsPages.size());
+      LOGGER.info("Collected up to search results page: " + highestIndexPage.getIndex());
+      LOGGER.debug("Total search results pages collected: " + searchResultsPages.size());
       LOGGER.info("Highest indexed url: " + highestIndexPage.getUrl());
       Document page =
-          fetchDocument(highestIndexPage.getUrl().toString(), SEARCH_RESULTS_DEFAULT_RETRY_TIMES)
+          new FetchDocumentCallable(
+                  highestIndexPage.getUrl().toString(),
+                  siteCollector,
+                  SEARCH_RESULTS_DEFAULT_RETRY_TIMES)
+              .call()
               .orElseThrow(
                   () ->
                       new PaginationPageFetchFailure(
@@ -118,5 +135,41 @@ public class FotocasaWebCrawler extends WebCrawler {
                               highestIndexPage.getIndex())));
       collectSearchResultsPages(page, highestIndexPage.getIndex());
     }
+  }
+
+  private void collectPagesConcurrently(Set<URL> pages, Consumer<Document> htmlActionCallback) {
+    ExecutorService executorService = Executors.newFixedThreadPool(20);
+    List<Future<Optional<Document>>> futures;
+    List<Callable<Optional<Document>>> callables =
+        pages.stream()
+            .map(
+                (url) ->
+                    new FetchDocumentCallable(
+                        url.toString(), siteCollector, SEARCH_RESULTS_DEFAULT_RETRY_TIMES))
+            .collect(Collectors.toList());
+    try {
+      // TEMPORARY: FETCHING ONLY ONE SINGLE PAGE
+      callables = List.of(callables.get(0));
+      futures = executorService.invokeAll(callables);
+      executorService.shutdown();
+      for (Future<Optional<Document>> future : futures) {
+        future.get().ifPresent(htmlActionCallback);
+      }
+    } catch (InterruptedException | ExecutionException interruptedException) {
+      LOGGER.error("Failed to collect home page urls: " + interruptedException.getMessage());
+    }
+  }
+
+  private void getHomePageUrls(Document resultsPage) {
+    List<URL> pages = listingsPagesHtmlParser.parse(resultsPage);
+    this.listingPageUrls.addAll(pages);
+    LOGGER.info("Total home pages collected: " + listingPageUrls.size());
+  }
+
+  private void getHome(Document resultsPage) {
+    // TODO: always a list of one element... consider adding a parseOne method to HtmlParser
+    // interface
+    List<RealEstate> home = listingHtmlParser.parse(resultsPage);
+    this.collectedHomes.addAll(home);
   }
 }
