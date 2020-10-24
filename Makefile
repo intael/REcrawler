@@ -25,6 +25,11 @@ database:
 execute:
 	docker exec -ti $(CONTAINER) java -cp target/$(ARTIFACT)-$(VERSION)-SNAPSHOT.jar Main
 
+.PHONY: test
+test:
+	docker exec -ti $(CONTAINER) mvn -B clean package -DskipTests -q
+	docker exec -ti $(CONTAINER) mvn test
+
 .PHONY: up
 up:
 	docker-compose up
