@@ -1,6 +1,7 @@
 package realestate.measures;
 
 import lombok.ToString;
+import realestate.exceptions.InvalidSurface;
 
 @ToString
 public class Surface {
@@ -14,7 +15,7 @@ public class Surface {
 
   private void guard(double amount) {
     if (amount < 0) {
-      throw new IllegalArgumentException("Surface's amount can not be negative.");
+      throw new InvalidSurface(amount);
     }
   }
 

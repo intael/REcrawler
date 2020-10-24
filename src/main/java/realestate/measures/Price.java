@@ -1,6 +1,9 @@
 package realestate.measures;
 
 import lombok.ToString;
+import realestate.exceptions.InvalidPrice;
+import realestate.exceptions.NegativeAmount;
+
 
 @ToString
 public class Price {
@@ -15,7 +18,7 @@ public class Price {
 
   private void guard(double amount) {
     if (amount < 0) {
-      throw new IllegalArgumentException("Price's amount can not be negative.");
+      throw new InvalidPrice(amount);
     }
   }
 
