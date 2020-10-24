@@ -54,21 +54,4 @@ public class SearchRealEstateUrlBuilderTest {
         IllegalArgumentException.class,
         () -> new SearchRealEstateUrlBuilder.Builder("", new Locale("en")));
   }
-
-  @Test
-  void builderRejectsNullOptionalQueryParameters() {
-    assertThrows(
-        IllegalArgumentException.class,
-        () -> new SearchRealEstateUrlBuilder.Builder("barcelona", new Locale("en")).atZone(null));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            new SearchRealEstateUrlBuilder.Builder("barcelona", new Locale("en"))
-                .withContract(null));
-    assertThrows(
-        IllegalArgumentException.class,
-        () ->
-            new SearchRealEstateUrlBuilder.Builder("barcelona", new Locale("en"))
-                .withPriceRange(null));
-  }
 }
