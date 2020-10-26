@@ -20,11 +20,12 @@ import webcrawling.repositories.ProxyRepository;
 import webcrawling.repositories.RemoteRestProxyRepository;
 import webcrawling.repositories.ShortListUserAgentRepository;
 import webcrawling.repositories.UserAgentRepository;
+import webcrawling.site_collectors.GenericSiteCollector;
 
-class FotocasaSiteCollectorTest {
+class GenericSiteCollectorTest {
 
-  private final Logger logger = LoggerFactory.getLogger(FotocasaSiteCollectorTest.class);
-  FotocasaSiteCollector instanceWithProxy;
+  private final Logger logger = LoggerFactory.getLogger(GenericSiteCollectorTest.class);
+  GenericSiteCollector instanceWithProxy;
 
   private Optional<Document> fetchFuture(Future<Optional<Document>> f) {
     try {
@@ -42,7 +43,7 @@ class FotocasaSiteCollectorTest {
     ProxyRepository proxyRepo =
         new RemoteRestProxyRepository(
             "https://api.proxyscrape.com/?request=getproxies&proxytype=http&timeout=750&country=all&ssl=all&anonymity=all");
-    this.instanceWithProxy = new FotocasaSiteCollector(userAgentRepo, null, null, proxyRepo, 60_000, 6);
+    this.instanceWithProxy = new GenericSiteCollector(userAgentRepo, null, null, proxyRepo, 60_000, 6);
   }
 
   @Test
@@ -52,7 +53,7 @@ class FotocasaSiteCollectorTest {
     int searches = 100;
     int index = 0;
     final int SUCCESS_CRITERIA = 30;
-    final FotocasaSiteCollector collector = this.instanceWithProxy;
+    final GenericSiteCollector collector = this.instanceWithProxy;
     List<Callable<Optional<Document>>> callables = new ArrayList<>();
     ExecutorService exec =
         Executors.newFixedThreadPool(

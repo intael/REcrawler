@@ -3,6 +3,7 @@ package webcrawling;
 import java.net.URL;
 import java.util.Set;
 import realestate.RealEstate;
+import webcrawling.site_collectors.SiteCollector;
 import webcrawling.specification.CrawlSpecification;
 
 public abstract class WebCrawler {

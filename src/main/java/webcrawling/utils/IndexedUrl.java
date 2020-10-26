@@ -1,4 +1,4 @@
-package webcrawlers.fotocasa;
+package webcrawling.utils;
 
 import java.net.URL;
 import org.jetbrains.annotations.NotNull;
