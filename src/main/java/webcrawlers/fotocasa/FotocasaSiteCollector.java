@@ -4,78 +4,116 @@ import java.io.IOException;
 import java.net.Proxy;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Random;
+import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Connection;
+import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webcrawling.SiteCollector;
+import webcrawling.SiteCollectorRanOutOfProxies;
+import webcrawling.repositories.ProxyRepository;
+import webcrawling.repositories.UserAgentRepository;
 
 // TODO: Add stateful usage statistics (eg, flush method)
 public class FotocasaSiteCollector implements SiteCollector {
 
-  private final String userAgent;
+  private final UserAgentRepository userAgentRepo;
   private final Map<String, String> cookies;
-  private Proxy proxy;
-  private final int timeout; // in milliseconds
+  private final Map<String, String> headers;
+  private final int timeoutInMiliseconds; // in milliseconds
   private final int maxRetries;
-  private final Logger logger = LoggerFactory.getLogger(FotocasaSiteCollector.class);
+  private final ProxyRepository proxyRepository;
+  private static final Logger LOGGER = LoggerFactory.getLogger(FotocasaSiteCollector.class);
+  private static final int PROXY_SWAP_ATTEMPTS_MULTIPLE = 3;
 
   public FotocasaSiteCollector(
-      @NotNull String userAgent,
+      @NotNull UserAgentRepository userAgentRepo,
       Map<String, String> cookies,
-      Proxy proxy,
-      int timeout,
+      Map<String, String> headers,
+      ProxyRepository proxyRepository,
+      int timeoutInMiliseconds,
       int maxRetries) {
-    this.userAgent = userAgent;
+    this.userAgentRepo = userAgentRepo;
     this.cookies = cookies;
-    this.proxy = proxy;
-    this.timeout = timeout;
+    this.headers = headers;
+    this.proxyRepository = proxyRepository;
+    this.timeoutInMiliseconds = timeoutInMiliseconds;
     this.maxRetries = maxRetries;
+    try {
+      this.proxyRepository.collectProxyList();
+    } catch (IOException ioException) {
+      LOGGER.error(
+          "Error fetching proxies. Proceeding without proxies: " + ioException.getMessage());
+    }
   }
 
-  public FotocasaSiteCollector(@NotNull String userAgent) {
-    this(userAgent, null, null, 30_000, 3);
+  public FotocasaSiteCollector(
+      @NotNull UserAgentRepository userAgentRepo, @NotNull ProxyRepository proxyRepository) {
+    this(userAgentRepo, null, null, proxyRepository, 30_000, 6);
   }
 
-  public Proxy getProxy() {
-    return proxy;
-  }
-
-  public void setProxy(@NotNull Proxy proxy) {
-    this.proxy = proxy;
-  }
-
-  public Optional<Document> collect(String url, int maxRetries) {
-    Connection conn = Jsoup.connect(url).userAgent(userAgent).timeout(timeout);
-    if (proxy != null) conn = conn.proxy(proxy);
+  public Optional<Document> collect(String url, int maxRetries)
+      throws SiteCollectorRanOutOfProxies {
+    Connection conn =
+        Jsoup.connect(url).timeout(timeoutInMiliseconds);
+    if (headers != null) conn = addHeaders(conn);
     if (cookies != null) conn = addCookies(conn);
     int attempts = 0;
+    Proxy proxy = fetchProxy(attempts);
+    conn = conn.proxy(proxy);
     while (attempts < maxRetries) {
+      conn = conn.userAgent(userAgentRepo.getRandomUserAgent());
       try {
-        return Optional.of(conn.get());
-      } catch (IOException requestError) {
-        attempts++;
+        Document document = conn.get();
+        proxyRepository.registerWorkingProxy(proxy);
+        return Optional.of(document);
+      }
+      catch (IOException requestError) {
+        if (++attempts % PROXY_SWAP_ATTEMPTS_MULTIPLE == 0) {
+          proxyRepository.registerFaultyProxy(proxy);
+          proxy = fetchProxy(attempts);
+        }
         // TODO: Make logging clearer and more informative
-        logger.error(
+        LOGGER.error(
             String.format(
-                "Failure with proxy: %s. Attempt: %s. Trace: %s",
-                this.proxy == null ? "Not using a proxy." : this.proxy.toString(),
-                attempts,
-                requestError.toString()));
+                "Failure with proxy: %s. Error: %s. Attempt: %s.",
+                proxy.toString(), requestError.toString(), attempts));
       }
     }
     return Optional.empty();
   }
 
-  public Optional<Document> collect(String url) {
+  private Proxy fetchProxy(int attemptsSoFar) throws SiteCollectorRanOutOfProxies {
+    Proxy fetchedProxy;
+    if (attemptsSoFar % PROXY_SWAP_ATTEMPTS_MULTIPLE == 0
+        && proxyRepository.getNumberOfWorkingProxies() > 0) {
+      fetchedProxy = proxyRepository.getRandomWorkingProxy();
+    } else if (proxyRepository.getNumberOfUnusedProxies() > 0) {
+      fetchedProxy = proxyRepository.getRandomUnusedProxy();
+    } else {
+      throw new SiteCollectorRanOutOfProxies("SiteCollector ran out of Proxies!");
+    }
+    return fetchedProxy;
+  }
+
+  public Optional<Document> collect(String url) throws SiteCollectorRanOutOfProxies {
     return collect(url, maxRetries);
+  }
+
+  private Connection addHeaders(Connection connection) {
+    for (String header : headers.keySet()) {
+      connection = connection.header(header, cookies.get(header));
+    }
+    return connection;
   }
 
   private Connection addCookies(Connection connection) {
     for (String cookie : cookies.keySet()) {
-      connection = connection.cookie(cookie, cookies.get(cookie));
+      connection = connection.header(cookie, cookies.get(cookie));
     }
     return connection;
   }

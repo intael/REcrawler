@@ -13,24 +13,20 @@ import webcrawlers.fotocasa.repositories.FotocasaRealEstateMySqlRepository;
 import webcrawling.HtmlParser;
 import webcrawling.RealEstateRepository;
 import webcrawling.UrlBuilder;
+import webcrawling.repositories.RemoteRestProxyRepository;
+import webcrawling.repositories.ShortListUserAgentRepository;
 
 class FotocasaWebCrawlerTest {
 
   private FotocasaWebCrawler instance;
 
-  private Proxy createProxyFromString(String proxyAddressString) {
-    String[] addressComponents = proxyAddressString.split(":");
-    InetSocketAddress proxyAddress =
-        new InetSocketAddress(addressComponents[0], Integer.parseInt(addressComponents[1]));
-    return new Proxy(Proxy.Type.HTTP, proxyAddress);
-  }
-
   @BeforeEach
   void setUp() {
     FotocasaSiteCollector siteCollector =
         new FotocasaSiteCollector(
-            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/86.0.4240.75 Safari/537.36");
-    //    siteCollector.setProxy(createProxyFromString("1.20.207.111:8080"));
+            new ShortListUserAgentRepository(),
+            new RemoteRestProxyRepository(
+                "https://api.proxyscrape.com/?request=getproxies&proxytype=http&timeout=750&country=all&ssl=all&anonymity=all"));
     HtmlParser<RealEstate> listingHtmlParser = new FotocasaListingHtmlParser();
     HtmlParser<URL> searchResultsPagesHtmlParser =
         new FotocasaFetchUrlsHtmlParser("a.sui-LinkBasic.sui-PaginationBasic-link");
