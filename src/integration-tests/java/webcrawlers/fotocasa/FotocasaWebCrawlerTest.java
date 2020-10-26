@@ -1,7 +1,5 @@
 package webcrawlers.fotocasa;
 
-import java.net.InetSocketAddress;
-import java.net.Proxy;
 import java.net.URL;
 import java.util.Locale;
 import org.junit.Assert;
@@ -15,6 +13,7 @@ import webcrawling.RealEstateRepository;
 import webcrawling.UrlBuilder;
 import webcrawling.repositories.RemoteRestProxyRepository;
 import webcrawling.repositories.ShortListUserAgentRepository;
+import webcrawling.site_collectors.GenericSiteCollector;
 
 class FotocasaWebCrawlerTest {
 
@@ -22,8 +21,8 @@ class FotocasaWebCrawlerTest {
 
   @BeforeEach
   void setUp() {
-    FotocasaSiteCollector siteCollector =
-        new FotocasaSiteCollector(
+    GenericSiteCollector siteCollector =
+        new GenericSiteCollector(
             new ShortListUserAgentRepository(),
             new RemoteRestProxyRepository(
                 "https://api.proxyscrape.com/?request=getproxies&proxytype=http&timeout=750&country=all&ssl=all&anonymity=all"));

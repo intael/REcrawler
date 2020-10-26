@@ -1,36 +1,31 @@
-package webcrawlers.fotocasa;
+package webcrawling.site_collectors;
 
 import java.io.IOException;
 import java.net.Proxy;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Random;
-import java.util.UUID;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Connection;
-import org.jsoup.HttpStatusException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webcrawling.SiteCollector;
-import webcrawling.SiteCollectorRanOutOfProxies;
 import webcrawling.repositories.ProxyRepository;
 import webcrawling.repositories.UserAgentRepository;
 
 // TODO: Add stateful usage statistics (eg, flush method)
-public class FotocasaSiteCollector implements SiteCollector {
+public class GenericSiteCollector implements SiteCollector {
 
   private final UserAgentRepository userAgentRepo;
   private final Map<String, String> cookies;
   private final Map<String, String> headers;
-  private final int timeoutInMiliseconds; // in milliseconds
+  private final int timeoutInMiliseconds;
   private final int maxRetries;
   private final ProxyRepository proxyRepository;
-  private static final Logger LOGGER = LoggerFactory.getLogger(FotocasaSiteCollector.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(GenericSiteCollector.class);
   private static final int PROXY_SWAP_ATTEMPTS_MULTIPLE = 3;
 
-  public FotocasaSiteCollector(
+  public GenericSiteCollector(
       @NotNull UserAgentRepository userAgentRepo,
       Map<String, String> cookies,
       Map<String, String> headers,
@@ -51,7 +46,7 @@ public class FotocasaSiteCollector implements SiteCollector {
     }
   }
 
-  public FotocasaSiteCollector(
+  public GenericSiteCollector(
       @NotNull UserAgentRepository userAgentRepo, @NotNull ProxyRepository proxyRepository) {
     this(userAgentRepo, null, null, proxyRepository, 30_000, 6);
   }

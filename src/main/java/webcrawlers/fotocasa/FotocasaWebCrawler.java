@@ -21,9 +21,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import realestate.RealEstate;
 import webcrawling.HtmlParser;
-import webcrawling.SiteCollector;
+import webcrawling.site_collectors.SiteCollector;
 import webcrawling.UrlBuilder;
 import webcrawling.WebCrawler;
+import webcrawling.utils.FetchDocumentCallable;
+import webcrawling.utils.IndexedUrl;
 
 public class FotocasaWebCrawler extends WebCrawler {
   private static final Logger LOGGER = LoggerFactory.getLogger(FotocasaWebCrawler.class);

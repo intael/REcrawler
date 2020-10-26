@@ -1,4 +1,4 @@
-package webcrawlers.fotocasa;
+package webcrawling.utils;
 
 import java.io.IOException;
 import java.util.Optional;
@@ -7,8 +7,8 @@ import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import webcrawling.SiteCollector;
-import webcrawling.SiteCollectorRanOutOfProxies;
+import webcrawling.site_collectors.SiteCollector;
+import webcrawling.site_collectors.SiteCollectorRanOutOfProxies;
 
 public class FetchDocumentCallable implements Callable<Optional<Document>> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FetchDocumentCallable.class);
