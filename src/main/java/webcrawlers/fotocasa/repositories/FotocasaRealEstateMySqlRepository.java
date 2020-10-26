@@ -3,6 +3,8 @@ package webcrawlers.fotocasa.repositories;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import realestate.RealEstate;
 import webcrawlers.fotocasa.entities.FotocasaHome;
 import webcrawling.RealEstateRepository;
@@ -11,18 +13,21 @@ public class FotocasaRealEstateMySqlRepository implements RealEstateRepository {
   public static final String DATABASE = "MYSQL_DATABASE";
   public static final String USER = "MYSQL_USER";
   public static final String PASSWORD = "MYSQL_ROOT_PASSWORD";
+  private static final Logger LOGGER =
+      LoggerFactory.getLogger(FotocasaRealEstateMySqlRepository.class);
 
   @Override
   public void save(RealEstate realEstate) {
     FotocasaHome home = (FotocasaHome) realEstate; // fix this...
     try {
+      // TODO: Move these to properties file
       String myDriver = "com.mysql.cj.jdbc.Driver";
       String myUrl = String.format("jdbc:mysql://127.0.0.1:33069/%s", System.getenv(DATABASE));
       Class.forName(myDriver);
       Connection conn =
           DriverManager.getConnection(myUrl, System.getenv(USER), System.getenv(PASSWORD));
 
-      // the mysql insert statement
+      // TODO: Move the query into a file
       String query =
           " insert into fotocasa_home (price, currency, surface, title, description, fotocasa_reference, home_category)"
               + " values (?, ?, ?, ?, ?, ?, ?)";
@@ -42,8 +47,7 @@ public class FotocasaRealEstateMySqlRepository implements RealEstateRepository {
 
       conn.close();
     } catch (Exception e) {
-      System.err.println("Got an exception!");
-      System.err.println(e.getMessage());
+      LOGGER.error("Could not save into MySQL: " + e.getMessage());
     }
   }
 }

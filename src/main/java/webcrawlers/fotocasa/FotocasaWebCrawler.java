@@ -28,7 +28,7 @@ import webcrawling.WebCrawler;
 public class FotocasaWebCrawler extends WebCrawler {
   private static final Logger LOGGER = LoggerFactory.getLogger(FotocasaWebCrawler.class);
   private static final Pattern SEARCH_RESULTS_URL_INDEX_REGEX = Pattern.compile("[0-9]+$");
-  private static final int SEARCH_RESULTS_DEFAULT_RETRY_TIMES = 6;
+  private static final int SEARCH_RESULTS_DEFAULT_RETRY_TIMES = 30;
   private final Set<URL> searchResultsPages = new HashSet<>();
   private final Set<URL> listingPageUrls = ConcurrentHashMap.newKeySet();
   private final Set<RealEstate> collectedHomes = ConcurrentHashMap.newKeySet();
@@ -148,8 +148,6 @@ public class FotocasaWebCrawler extends WebCrawler {
                         url.toString(), siteCollector, SEARCH_RESULTS_DEFAULT_RETRY_TIMES))
             .collect(Collectors.toList());
     try {
-      // TEMPORARY: FETCHING ONLY ONE SINGLE PAGE
-      callables = List.of(callables.get(0));
       futures = executorService.invokeAll(callables);
       executorService.shutdown();
       for (Future<Optional<Document>> future : futures) {
@@ -168,7 +166,6 @@ public class FotocasaWebCrawler extends WebCrawler {
 
   private void getHome(Document resultsPage) {
     // TODO: always a list of one element... consider adding a parseOne method to HtmlParser
-    // interface
     List<RealEstate> home = listingHtmlParser.parse(resultsPage);
     this.collectedHomes.addAll(home);
   }

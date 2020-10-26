@@ -8,6 +8,7 @@ import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import webcrawling.SiteCollector;
+import webcrawling.SiteCollectorRanOutOfProxies;
 
 public class FetchDocumentCallable implements Callable<Optional<Document>> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FetchDocumentCallable.class);
@@ -28,6 +29,8 @@ public class FetchDocumentCallable implements Callable<Optional<Document>> {
       return this.siteCollector.collect(url, retries);
     } catch (IOException ioe) {
       LOGGER.error("Failed to fetch document. Exception: " + ioe.toString());
+    } catch (SiteCollectorRanOutOfProxies outOfProxies) {
+      LOGGER.error("The program ran out of proxies to be used, returning empty Optional.");
     }
     return Optional.empty();
   }

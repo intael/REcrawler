@@ -104,6 +104,7 @@ public class FotocasaListingHtmlParser implements HtmlParser<RealEstate> {
   private Optional<Price> getPrice(Document document) {
     Optional<Price> price = Optional.empty();
     Element priceElement = document.selectFirst(PRICE_CONTAINER_CSS_CLASS_NAME);
+    if(priceElement == null) return price;
     String priceString = priceElement.text();
     try {
       Number priceAmount = localeNumberFormat.parse(priceString);
@@ -118,6 +119,9 @@ public class FotocasaListingHtmlParser implements HtmlParser<RealEstate> {
   }
 
   private Optional<String> getOptionalUniqueElement(Document document, String cssClassName) {
-    return Optional.of(document.selectFirst(cssClassName).text());
+    Element element = document.selectFirst(cssClassName);
+    if(element == null)
+      return Optional.empty();
+    return Optional.of(element.text());
   }
 }
