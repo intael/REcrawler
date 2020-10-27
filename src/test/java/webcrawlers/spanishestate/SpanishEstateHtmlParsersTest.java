@@ -18,9 +18,6 @@ public class SpanishEstateHtmlParsersTest {
   private static final List<String> HOUSE_PAGE_SAMPLES_FILENAMES = List.of();
   private Document listingsSearchResultPageSample;
   private final List<Document> housePageSamples = new ArrayList<>();
-  private static final String PAGINATION_SEARCH_RESULTS_CSS_CLASS_NAME =
-      "a.sui-LinkBasic.sui-PaginationBasic-link";
-  private static final String LISTINGS_SEARCH_RESULTS_CSS_CLASS_NAME = "a.re-Card-link";
 
   @BeforeEach
   void setUp() throws IOException {
