@@ -11,20 +11,20 @@ import webcrawlers.fotocasa.entities.FotocasaContract;
 import webcrawlers.fotocasa.entities.HomeCategory;
 import webcrawling.specification.PriceRange;
 
-public class SearchRealEstateUrlBuilderTest {
+public class FotocasaSearchUrlBuilderTest {
 
-  SearchRealEstateUrlBuilder instanceWithoutOptionals;
-  SearchRealEstateUrlBuilder instanceWithAllOptionals;
+  FotocasaSearchUrlBuilder instanceWithoutOptionals;
+  FotocasaSearchUrlBuilder instanceWithAllOptionals;
 
   @BeforeEach
   public void setUp() {
     instanceWithoutOptionals =
-        new SearchRealEstateUrlBuilder.Builder("barcelona", new Locale("en")).build();
+        new FotocasaSearchUrlBuilder.Builder("barcelona", new Locale("en")).build();
     Price lowerBound = new Price(800, "EUR");
     Price upperBound = new Price(2000, "EUR");
     PriceRange somePriceRange = new PriceRange(lowerBound, upperBound);
     instanceWithAllOptionals =
-        new SearchRealEstateUrlBuilder.Builder("barcelona", new Locale("en"))
+        new FotocasaSearchUrlBuilder.Builder("barcelona", new Locale("en"))
             .withContract(FotocasaContract.RENTAL)
             .withPriceRange(somePriceRange)
             .atZone("Sants")
@@ -52,6 +52,6 @@ public class SearchRealEstateUrlBuilderTest {
   void builderThrowsIllegalArgExceptionWhenSearchTermIsEmptyString() {
     assertThrows(
         IllegalArgumentException.class,
-        () -> new SearchRealEstateUrlBuilder.Builder("", new Locale("en")));
+        () -> new FotocasaSearchUrlBuilder.Builder("", new Locale("en")));
   }
 }

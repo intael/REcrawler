@@ -31,7 +31,7 @@ class FotocasaWebCrawlerTest {
         new FotocasaFetchUrlsHtmlParser("a.sui-LinkBasic.sui-PaginationBasic-link");
     HtmlParser<URL> listingsPagesHtmlParser = new FotocasaFetchUrlsHtmlParser("a.re-Card-link");
     UrlBuilder urlBuilder =
-        new SearchRealEstateUrlBuilder.Builder("cornella-de-llobregat", new Locale("en")).build();
+        new FotocasaSearchUrlBuilder.Builder("cornella-de-llobregat", new Locale("en")).build();
     this.instance =
         new FotocasaWebCrawler(
             siteCollector,

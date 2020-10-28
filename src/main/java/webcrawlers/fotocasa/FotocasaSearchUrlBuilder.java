@@ -13,9 +13,9 @@ import webcrawling.UrlBuilder;
 import webcrawling.specification.Contract;
 import webcrawling.specification.PriceRange;
 
-public class SearchRealEstateUrlBuilder implements UrlBuilder {
-  private static final String PROTOCOL = "https"; // move to property file
-  private static final String SITE_HOST = "www.fotocasa.es"; // move to property file
+public class FotocasaSearchUrlBuilder implements UrlBuilder {
+  private static final String PROTOCOL = "https";
+  private static final String SITE_HOST = "www.fotocasa.es";
   private static final String SEARCH_LISTINGS_ENDPOINT = "l";
   private static final String MIN_PRICE_ENDPOINT_PARAMETER = "minPrice";
   private static final String MAX_PRICE_ENDPOINT_PARAMETER = "maxPrice";
@@ -30,7 +30,7 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
   private final Contract contract;
   private final String searchTerm;
 
-  private SearchRealEstateUrlBuilder(Builder builder) {
+  private FotocasaSearchUrlBuilder(Builder builder) {
     zone = builder.zone;
     language = builder.language;
     priceRange = builder.priceRange;
@@ -65,7 +65,7 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
       throw new RuntimeException(
           "Failed to build URL with the following components. Path: "
               + path
-              + "Query Parans: "
+              + "Query Params: "
               + optionalQueryParameters);
     }
     return url;
@@ -87,7 +87,7 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
     return queryParameters;
   }
 
-  /** {@code SearchRealEstateUrlBuilder} builder static inner class. */
+  /** {@code FotocasaSearchUrlBuilder} builder static inner class. */
   public static final class Builder {
     private String zone;
     private final String language;
@@ -199,14 +199,14 @@ public class SearchRealEstateUrlBuilder implements UrlBuilder {
     }
 
     /**
-     * Returns a {@code SearchRealEstateUrlBuilder} built from the parameters previously set.
+     * Returns a {@code FotocasaSearchUrlBuilder} built from the parameters previously set.
      *
-     * @return a {@code SearchRealEstateUrlBuilder} built with parameters of this {@code
-     *     SearchRealEstateUrlBuilder.Builder}
+     * @return a {@code FotocasaSearchUrlBuilder} built with parameters of this {@code
+     *     FotocasaSearchUrlBuilder.Builder}
      */
     @NotNull
-    public SearchRealEstateUrlBuilder build() {
-      return new SearchRealEstateUrlBuilder(this);
+    public FotocasaSearchUrlBuilder build() {
+      return new FotocasaSearchUrlBuilder(this);
     }
   }
 }
