@@ -12,6 +12,11 @@ public interface HtmlParser<T> {
 
   String HREF_ATTRIBUTE = "href";
   String A_HTML_TAG = "a";
+  String SPAN_HTML_TAG = "span";
+  String TABLE_HTML_TAG = "table";
+  String TBODY_HTML_TAG = "tbody";
+  String TD_HTML_TAG = "td";
+  String TR_HTML_TAG = "tr";
   Logger LOGGER = LoggerFactory.getLogger(HtmlParser.class);
 
   List<T> parse(@NotNull Document document);

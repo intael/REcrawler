@@ -15,7 +15,7 @@ import webcrawling.HtmlParser;
 
 class FotocasaHtmlParsersTest {
   public static final String DOMAIN = "fotocasa";
-  private static final String LISTINGS_PAGE_SAMPLE_FILENAME =
+  private static final String SEARCH_RESULTS_SAMPLE_FILENAME =
       "listings-page-sample-2020-10-07.html";
   private static final List<String> HOUSE_PAGE_SAMPLES_FILENAMES =
       List.of(
@@ -31,7 +31,7 @@ class FotocasaHtmlParsersTest {
   @BeforeEach
   void setUp() throws IOException {
     this.listingsSearchResultPageSample =
-        TestFilesUtils.readAndParseHtmlFile(DOMAIN, LISTINGS_PAGE_SAMPLE_FILENAME);
+        TestFilesUtils.readAndParseHtmlFile(DOMAIN, SEARCH_RESULTS_SAMPLE_FILENAME);
     for (String sample : HOUSE_PAGE_SAMPLES_FILENAMES) {
       housePageSamples.add(TestFilesUtils.readAndParseHtmlFile(DOMAIN, sample));
     }
