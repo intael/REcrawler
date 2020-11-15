@@ -71,6 +71,11 @@ public class FotocasaSearchUrlBuilder implements UrlBuilder {
     return url;
   }
 
+  @Override
+  public String buildUrl(int pageNumber) {
+    throw new UnsupportedOperationException("The method is notimplemented.");
+  }
+
   private Map<String, String> generateOptionalQueryParametersMap(
       PriceRange priceRange, int minimumRooms, int minimumRestRooms) {
     String minRooms = minimumRooms == 0 ? "" : Integer.toString(minimumRooms);
@@ -112,7 +117,7 @@ public class FotocasaSearchUrlBuilder implements UrlBuilder {
     }
 
     private void guard(@NotNull String searchTerm) {
-      if(searchTerm.length() == 0)
+      if (searchTerm.length() == 0)
         throw new IllegalArgumentException("The searchterm argument can not be a 0 length string");
     }
 
@@ -156,8 +161,8 @@ public class FotocasaSearchUrlBuilder implements UrlBuilder {
     }
 
     /**
-     * Sets the {@code homeCategory} and returns a reference to this Builder so that the methods can be
-     * chained together.
+     * Sets the {@code homeCategory} and returns a reference to this Builder so that the methods can
+     * be chained together.
      *
      * @param homeCategory the {@code homeCategory} to set
      * @return a reference to this Builder

@@ -1,4 +1,4 @@
-package webcrawlers.fotocasa;
+package webcrawlers.fotocasa.parsing;
 
 import java.net.URL;
 import java.util.List;
@@ -6,7 +6,7 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import webcrawling.HtmlParser;
+import webcrawling.parsing.HtmlParser;
 
 public class FotocasaFetchUrlsHtmlParser implements HtmlParser<URL> {
   private final String cssClassName;
