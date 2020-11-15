@@ -17,6 +17,8 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class RemoteRestProxyRepository implements ProxyRepository {
   private static final String NEWLINE_REGEX = "\\r?\\n";
@@ -25,6 +27,7 @@ public class RemoteRestProxyRepository implements ProxyRepository {
   private final Map<Proxy, Proxy> faultyProxies = new ConcurrentHashMap<>();
   private final String restApiEndpoint;
   private final CloseableHttpClient httpClient;
+  private static final Logger LOGGER = LoggerFactory.getLogger(RemoteRestProxyRepository.class);
 
   public RemoteRestProxyRepository(@NotNull String restApiEndpoint) {
     this.restApiEndpoint = restApiEndpoint;
@@ -32,21 +35,20 @@ public class RemoteRestProxyRepository implements ProxyRepository {
   }
 
   @Override
-  public void collectProxyList() throws IOException {
-    try {
-      HttpGet request = new HttpGet(restApiEndpoint);
-      try (CloseableHttpResponse response = httpClient.execute(request)) {
-        HttpEntity entity = response.getEntity();
-        if (entity != null) {
-          String result = EntityUtils.toString(entity);
-          proxies.putAll(
-              Arrays.stream(result.split(NEWLINE_REGEX))
-                  .map(ProxyRepository::createProxyFromString)
-                  .collect(Collectors.toMap((proxy) -> proxy, (proxy) -> proxy)));
-        }
+  public void collectProxyList() {
+    HttpGet request = new HttpGet(restApiEndpoint);
+    try (CloseableHttpResponse response = httpClient.execute(request)) {
+      HttpEntity entity = response.getEntity();
+      if (entity != null) {
+        String result = EntityUtils.toString(entity);
+        proxies.putAll(
+            Arrays.stream(result.split(NEWLINE_REGEX))
+                .map(ProxyRepository::createProxyFromString)
+                .distinct()
+                .collect(Collectors.toMap((proxy) -> proxy, (proxy) -> proxy)));
       }
-    } finally {
-      httpClient.close();
+    } catch (IOException ioException) {
+      LOGGER.error("Failed to collect new proxies.");
     }
   }
 

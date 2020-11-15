@@ -14,7 +14,7 @@ public class ShortListUserAgentRepository implements UserAgentRepository {
   public ShortListUserAgentRepository() {
     File userAgentsFilePath =
         Paths.get(
-                FileUtil.resourcesDirectory.toString(),
+                FileUtil.RESOURCES_DIRECTORY.toString(),
                 USER_AGENTS_DIRECTORY,
                 CHROME_USER_AGENTS_FILE)
             .toFile();

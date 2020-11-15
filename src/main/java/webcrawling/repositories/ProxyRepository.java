@@ -7,7 +7,7 @@ import java.util.Set;
 
 public interface ProxyRepository {
 
-  void collectProxyList() throws IOException;
+  void collectProxyList();
 
   Proxy getRandomUnusedProxy();
 
