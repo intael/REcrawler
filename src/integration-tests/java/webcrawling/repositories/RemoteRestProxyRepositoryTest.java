@@ -5,6 +5,7 @@ import java.net.Proxy;
 import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 
 class RemoteRestProxyRepositoryTest {
   private final String PROXY_SCRAPE_ENDPOINT =
@@ -12,33 +13,34 @@ class RemoteRestProxyRepositoryTest {
   private RemoteRestProxyRepository instance;
 
   @BeforeEach
-  void setUp() {
+  void setUp() throws IOException{
     this.instance = new RemoteRestProxyRepository(PROXY_SCRAPE_ENDPOINT);
+    this.instance.collectProxyList();
   }
 
   @Test
+  @EnabledIfEnvironmentVariable(named = "ENABLE_INTEGRATION_TESTS", matches = "true")
   void testcollectProxyListGetsDataFromRemote() throws IOException {
-    this.instance.collectProxyList();
     Assert.assertTrue(this.instance.getAllUnusedProxies().size() > 0);
   }
 
   @Test
+  @EnabledIfEnvironmentVariable(named = "ENABLE_INTEGRATION_TESTS", matches = "true")
   void testgetRandomProxyReturnsAProxy() throws IOException {
-    this.instance.collectProxyList();
     Assert.assertNotNull(this.instance.getRandomUnusedProxy());
   }
 
   @Test
+  @EnabledIfEnvironmentVariable(named = "ENABLE_INTEGRATION_TESTS", matches = "true")
   void testWorkingProxiesGetProperlyRegistered() throws IOException {
-    this.instance.collectProxyList();
     Proxy proxy = this.instance.getRandomUnusedProxy();
     this.instance.registerWorkingProxy(proxy);
     Assert.assertEquals(1, this.instance.getNumberOfWorkingProxies());
   }
 
   @Test
+  @EnabledIfEnvironmentVariable(named = "ENABLE_INTEGRATION_TESTS", matches = "true")
   void testFaultyProxiesGetProperlyRegistered() throws IOException {
-    this.instance.collectProxyList();
     Proxy proxy = this.instance.getRandomUnusedProxy();
     this.instance.registerWorkingProxy(proxy);
     this.instance.deregisterWorkingProxy(proxy);

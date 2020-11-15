@@ -1,4 +1,4 @@
-package webcrawlers.fotocasa;
+package webcrawlers.fotocasa.parsing;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -14,9 +14,10 @@ import org.slf4j.LoggerFactory;
 import realestate.RealEstate;
 import realestate.measures.Price;
 import realestate.measures.Surface;
+import webcrawlers.fotocasa.RequiredFieldNotFound;
 import webcrawlers.fotocasa.entities.FotocasaHome;
 import webcrawlers.fotocasa.entities.FotocasaHouseId;
-import webcrawling.HtmlParser;
+import webcrawling.parsing.HtmlParser;
 
 public class FotocasaListingHtmlParser implements HtmlParser<RealEstate> {
 

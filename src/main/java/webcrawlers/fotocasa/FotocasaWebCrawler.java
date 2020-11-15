@@ -1,6 +1,7 @@
 package webcrawlers.fotocasa;
 
 import java.net.URL;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -20,22 +21,25 @@ import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import realestate.RealEstate;
-import webcrawling.HtmlParser;
-import webcrawling.site_collectors.SiteCollector;
 import webcrawling.UrlBuilder;
 import webcrawling.WebCrawler;
+import webcrawling.parsing.HtmlParser;
+import webcrawling.site_collectors.SiteCollector;
 import webcrawling.utils.FetchDocumentCallable;
 import webcrawling.utils.IndexedUrl;
 
-public class FotocasaWebCrawler extends WebCrawler {
+public class FotocasaWebCrawler implements WebCrawler {
   private static final Logger LOGGER = LoggerFactory.getLogger(FotocasaWebCrawler.class);
   private static final Pattern SEARCH_RESULTS_URL_INDEX_REGEX = Pattern.compile("[0-9]+$");
   private static final int SEARCH_RESULTS_DEFAULT_RETRY_TIMES = 30;
   private final Set<URL> searchResultsPages = new HashSet<>();
   private final Set<URL> listingPageUrls = ConcurrentHashMap.newKeySet();
   private final Set<RealEstate> collectedHomes = ConcurrentHashMap.newKeySet();
-
+  private final SiteCollector siteCollector;
+  private final HtmlParser<RealEstate> listingHtmlParser;
+  private final HtmlParser<URL> searchResultsPagesHtmlParser;
   private final HtmlParser<URL> listingsPagesHtmlParser;
+  private final UrlBuilder urlBuilder;
 
   public Set<URL> getSearchResultsPages() {
     return new HashSet<>(searchResultsPages); // defensive copy
@@ -45,7 +49,7 @@ public class FotocasaWebCrawler extends WebCrawler {
     return new HashSet<>(listingPageUrls); // defensive copy
   }
 
-  public Set<RealEstate> getCollectedHomes() {
+  public Set<RealEstate> getCollectedRealEstates() {
     return new HashSet<>(collectedHomes); // defensive copy
   }
 
@@ -66,7 +70,12 @@ public class FotocasaWebCrawler extends WebCrawler {
   public void crawl() {
     String searchUrl = urlBuilder.buildUrl();
     Optional<Document> initialSearchResult =
-        new FetchDocumentCallable(searchUrl, siteCollector, SEARCH_RESULTS_DEFAULT_RETRY_TIMES)
+        new FetchDocumentCallable(
+                searchUrl,
+                siteCollector,
+                SEARCH_RESULTS_DEFAULT_RETRY_TIMES,
+                new HashMap<>(),
+                new HashMap<>())
             .call();
     if (initialSearchResult.isEmpty()) {
       LOGGER.error("Failed to even fetch the initial search results page.");
@@ -127,7 +136,9 @@ public class FotocasaWebCrawler extends WebCrawler {
           new FetchDocumentCallable(
                   highestIndexPage.getUrl().toString(),
                   siteCollector,
-                  SEARCH_RESULTS_DEFAULT_RETRY_TIMES)
+                  SEARCH_RESULTS_DEFAULT_RETRY_TIMES,
+                  new HashMap<>(),
+                  new HashMap<>())
               .call()
               .orElseThrow(
                   () ->
@@ -147,7 +158,11 @@ public class FotocasaWebCrawler extends WebCrawler {
             .map(
                 (url) ->
                     new FetchDocumentCallable(
-                        url.toString(), siteCollector, SEARCH_RESULTS_DEFAULT_RETRY_TIMES))
+                        url.toString(),
+                        siteCollector,
+                        SEARCH_RESULTS_DEFAULT_RETRY_TIMES,
+                        new HashMap<>(),
+                        new HashMap<>()))
             .collect(Collectors.toList());
     try {
       futures = executorService.invokeAll(callables);

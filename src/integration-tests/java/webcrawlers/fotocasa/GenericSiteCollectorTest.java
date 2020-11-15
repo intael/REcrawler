@@ -43,7 +43,7 @@ class GenericSiteCollectorTest {
     ProxyRepository proxyRepo =
         new RemoteRestProxyRepository(
             "https://api.proxyscrape.com/?request=getproxies&proxytype=http&timeout=750&country=all&ssl=all&anonymity=all");
-    this.instanceWithProxy = new GenericSiteCollector(userAgentRepo, null, null, proxyRepo, 60_000, 6);
+    this.instanceWithProxy = new GenericSiteCollector(userAgentRepo, proxyRepo, 60_000, 6);
   }
 
   @Test

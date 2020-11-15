@@ -1,13 +1,18 @@
 .EXPORT_ALL_VARIABLES:
 
-export CONTAINER=core_scrapper
+export CONTAINER=REcrawler
 export DATABASE=db_scrapper
-export ARTIFACT=housing-scraper
+export ARTIFACT=REcrawler
 export VERSION=1.0
 
 .PHONY: bash
 bash:
 	docker exec -ti $(CONTAINER) bash
+
+.PHONY: rebuild_db
+rebuild_db:
+	docker-compose down
+	docker-compose up
 
 .PHONY: build
 build:
@@ -27,9 +32,12 @@ execute:
 
 .PHONY: test
 test:
-	docker exec -ti $(CONTAINER) mvn -B clean package -DskipTests -q
 	docker exec -ti $(CONTAINER) mvn test
 
 .PHONY: up
 up:
 	docker-compose up
+
+.PHONY: down
+down:
+	docker-compose down

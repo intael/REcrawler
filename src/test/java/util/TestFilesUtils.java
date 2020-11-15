@@ -1,9 +1,12 @@
 package util;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
 
 public class TestFilesUtils {
 
@@ -14,7 +17,8 @@ public class TestFilesUtils {
   public static final Path htmlSamplesDirectory =
       Paths.get(resourcesDirectory.toString(), "html-samples");
 
-  public static File getHtmlSampleAsFile(String fileName) {
-    return Paths.get(htmlSamplesDirectory.toString(), fileName).toFile();
+  public static Document readAndParseHtmlFile(String domain, String fileName) throws IOException {
+    File htmlFile = Paths.get(htmlSamplesDirectory.toString(), domain, fileName).toFile();
+    return Jsoup.parse(htmlFile, null);
   }
 }
