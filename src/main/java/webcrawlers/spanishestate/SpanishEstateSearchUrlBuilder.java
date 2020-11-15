@@ -33,14 +33,17 @@ public class SpanishEstateSearchUrlBuilder implements UrlBuilder {
 
   @Override
   public String buildUrl() {
-    String path =
-        String.join(
-                "/",
-                buildStringFromOptionalStrings( // this is needed because the potential nulls from
-                                                // region and municipality can cause problems if not
-                                                // explicitly excluded
-                    "sale", "property", province, region, municipality))
-            + "/";
+    return buildUrl(1);
+  }
+
+  @Override
+  public String buildUrl(int pageNumber) {
+    String path = buildPath();
+    if (pageNumber == 1) {
+      path = String.format(path, "");
+    } else {
+      path = String.format(path, "homes-p/" + pageNumber + "/");
+    }
     Map<String, String> optionalQueryParameters =
         generateOptionalQueryParametersMap(
             priceRange, minimumRooms, minimumRestRooms, propertyTypes, surface);
@@ -62,6 +65,16 @@ public class SpanishEstateSearchUrlBuilder implements UrlBuilder {
     return url;
   }
 
+  private String buildPath() {
+    return String.join(
+            "/",
+            buildStringFromOptionalStrings( // this is needed because the potential nulls from
+                // region and municipality can cause problems if not
+                // explicitly excluded
+                "sale", "property", province, region, municipality))
+        + "/%s";
+  }
+
   private List<String> buildStringFromOptionalStrings(String... optionalStrings) {
     List<String> pathComponents = new ArrayList<>();
     for (String string : optionalStrings) {
@@ -72,12 +85,14 @@ public class SpanishEstateSearchUrlBuilder implements UrlBuilder {
 
   private Map<String, String> generateOptionalQueryParametersMap(
       PriceRange priceRange,
-      int minimumRooms,
-      int minimumRestRooms,
+      Integer minimumRooms,
+      Integer minimumRestRooms,
       String propertyTypes,
       Surface surface) {
-    String minRooms = minimumRooms == 0 ? "" : Integer.toString(minimumRooms);
-    String minRestRooms = minimumRestRooms == 0 ? "" : Integer.toString(minimumRestRooms);
+    String minRooms =
+        minimumRooms == null || minimumRooms == 0 ? "" : Integer.toString(minimumRooms);
+    String minRestRooms =
+        minimumRestRooms == null || minimumRestRooms == 0 ? "" : Integer.toString(minimumRestRooms);
     String minPrice =
         priceRange == null ? "" : Integer.toString((int) priceRange.getLowerBound().getAmount());
     String maxPrice =
@@ -108,13 +123,13 @@ public class SpanishEstateSearchUrlBuilder implements UrlBuilder {
 
   /** {@code SpanishEstateSearchUrlBuilder} builder static inner class. */
   public static final class Builder {
-    private String province;
+    private final String province;
     private String region;
     private String municipality;
     private String propertyTypes;
     private PriceRange priceRange;
-    private int minimumRooms;
-    private int minimumRestRooms;
+    private Integer minimumRooms;
+    private Integer minimumRestRooms;
     private Surface surface;
 
     public Builder(@NotNull String province) {
@@ -149,7 +164,7 @@ public class SpanishEstateSearchUrlBuilder implements UrlBuilder {
      * @return a reference to this Builder
      */
     public Builder withMunicipality(String municipality) {
-      if (region == null)
+      if (municipality != null && region == null)
         throw new IllegalStateException(
             "Municipality can not be initialized without region being already set. Call withRegion first and make sure this municipality belongs to that region or the site will return 0 results.");
       this.municipality = municipality;
@@ -187,7 +202,7 @@ public class SpanishEstateSearchUrlBuilder implements UrlBuilder {
      * @param minimumRooms the {@code minimumRooms} to set
      * @return a reference to this Builder
      */
-    public Builder withMinimumRooms(int minimumRooms) {
+    public Builder withMinimumRooms(Integer minimumRooms) {
       this.minimumRooms = minimumRooms;
       return this;
     }
@@ -199,7 +214,7 @@ public class SpanishEstateSearchUrlBuilder implements UrlBuilder {
      * @param minimumRestRooms the {@code minimumRestRooms} to set
      * @return a reference to this Builder
      */
-    public Builder withMinimumRestRooms(int minimumRestRooms) {
+    public Builder withMinimumRestRooms(Integer minimumRestRooms) {
       this.minimumRestRooms = minimumRestRooms;
       return this;
     }
@@ -211,7 +226,7 @@ public class SpanishEstateSearchUrlBuilder implements UrlBuilder {
      * @param surface the {@code surface} to set
      * @return a reference to this Builder
      */
-    public Builder withMinimumSurface(int surface) {
+    public Builder withMinimumSurface(Integer surface) {
       this.surface = new Surface(surface);
       return this;
     }

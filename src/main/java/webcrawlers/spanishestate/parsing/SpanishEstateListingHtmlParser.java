@@ -1,4 +1,4 @@
-package webcrawlers.spanishestate;
+package webcrawlers.spanishestate.parsing;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -17,7 +17,8 @@ import realestate.RealEstate;
 import realestate.measures.Price;
 import realestate.measures.Surface;
 import webcrawlers.fotocasa.RequiredFieldNotFound;
-import webcrawling.HtmlParser;
+import webcrawlers.spanishestate.entities.SpanishEstateHome;
+import webcrawling.parsing.HtmlParser;
 
 public class SpanishEstateListingHtmlParser implements HtmlParser<RealEstate> {
 
@@ -42,37 +43,44 @@ public class SpanishEstateListingHtmlParser implements HtmlParser<RealEstate> {
   @Override
   public List<RealEstate> parse(@NotNull Document document) {
     Element detailsBox = document.selectFirst(DETAILS_CONTAINER_CSS_CLASS_NAME);
+    if (detailsBox == null) {
+      LOGGER.error("No detail box found in the page, returning empty list.");
+      return List.of();
+    }
     Elements detailsTable =
         detailsBox.selectFirst(TABLE_HTML_TAG).selectFirst(TBODY_HTML_TAG).select(TR_HTML_TAG);
     Map<String, String> details = collectDetailsFromHtmlTable(detailsTable);
+    Optional<SpanishEstateHome.Builder> spanishEstateHomeBuilder = Optional.empty();
     try {
       Price price =
           parsePrice(details.get(PRICE_DETAIL_NAME))
               .orElseThrow(
                   () -> new RequiredFieldNotFound("price", DETAILS_CONTAINER_CSS_CLASS_NAME));
-      Surface surface =
-          parseSurface(details.get(M2_DETAIL_NAME))
-              .orElseThrow(
-                  () -> new RequiredFieldNotFound("surface", DETAILS_CONTAINER_CSS_CLASS_NAME));
-      return List.of(
-          new SpanishEstateHome.Builder(
+      spanishEstateHomeBuilder =
+          Optional.of(
+              new SpanishEstateHome.Builder(
                   Integer.parseInt(details.get(NUMBER_DETAIL_NAME)),
                   details.get(REFERENCE_DETAIL_NAME),
-                  price,
-                  surface)
-              .withRegion(details.get(REFERENCE_DETAIL_NAME))
-              .withLocation(details.get(LOCATION_DETAIL_NAME))
-              .withType(details.get(TYPE_DETAIL_NAME))
-              .withBedrooms(Integer.parseInt(details.get(BEDROOMS_DETAIL_NAME)))
-              .withBathrooms(Integer.parseInt(details.get(BATHROOMS_DETAIL_NAME)))
-              .withPlot(parseSurface(details.get(PLOT_DETAIL_NAME)).orElse(null))
-              .withTitle(parseTitle(document))
-              .withDescription(parseDescription(document))
-              .build());
-    } catch (RequiredFieldNotFound fieldNotFound) {
+                  price));
+    } catch (RequiredFieldNotFound | NumberFormatException fieldNotFound) {
       logger.error(fieldNotFound.getMessage());
       return List.of();
     }
+    Optional<Integer> bedrooms = tryParseIntFromString(details.get(BEDROOMS_DETAIL_NAME));
+    Optional<Integer> bathrooms = tryParseIntFromString(details.get(BATHROOMS_DETAIL_NAME));
+    SpanishEstateHome.Builder builder =
+        spanishEstateHomeBuilder
+            .get()
+            .withSurface(parseSurface(details.get(M2_DETAIL_NAME)).orElse(null))
+            .withRegion(details.get(REGION_DETAIL_NAME))
+            .withLocation(details.get(LOCATION_DETAIL_NAME))
+            .withType(details.get(TYPE_DETAIL_NAME))
+            .withPlot(parseSurface(details.get(PLOT_DETAIL_NAME)).orElse(null))
+            .withTitle(parseTitle(document))
+            .withDescription(parseDescription(document));
+    bedrooms.ifPresent(builder::withBedrooms);
+    bathrooms.ifPresent(builder::withBedrooms);
+    return List.of(builder.build());
   }
 
   private Map<String, String> collectDetailsFromHtmlTable(Elements detailsTable) {
@@ -102,7 +110,7 @@ public class SpanishEstateListingHtmlParser implements HtmlParser<RealEstate> {
           Optional.of(
               new Price(priceAmount.doubleValue(), localeNumberFormat.getCurrency().toString()));
     } catch (ParseException pe) {
-      logger.error(
+      logger.warn(
           "Failed to parse price from the string: " + priceString + ". Details: " + pe.toString());
     }
     return price;
@@ -116,13 +124,21 @@ public class SpanishEstateListingHtmlParser implements HtmlParser<RealEstate> {
               new Surface(
                   Integer.parseInt(surfaceString.substring(0, surfaceString.indexOf("m2") - 1))));
     } catch (NumberFormatException formatException) {
-      logger.error(
+      logger.warn(
           "Failed to parse surface from the string: "
               + surfaceString
               + ". Details: "
               + formatException.toString());
     }
     return surface;
+  }
+
+  private Optional<Integer> tryParseIntFromString(String intString) {
+    try {
+      return Optional.of(Integer.parseInt(intString));
+    } catch (NumberFormatException numberFormatException) {
+      return Optional.empty();
+    }
   }
 
   private String parseTitle(Document document) {
@@ -132,8 +148,11 @@ public class SpanishEstateListingHtmlParser implements HtmlParser<RealEstate> {
         .text();
   }
 
+  // mejorar esto
   private String parseDescription(Document document) {
-    Elements paragraphs = document.selectFirst(DESCRIPTION_P_CSS_CLASS_NAME).select("p");
+    Element descriptionDiv = document.selectFirst(DESCRIPTION_P_CSS_CLASS_NAME);
+    if (descriptionDiv == null) return null;
+    Elements paragraphs = descriptionDiv.select(P_HTML_TAG);
     StringBuilder text = new StringBuilder();
     paragraphs.forEach((element) -> text.append(element.text()).append("\n"));
     return text.toString();

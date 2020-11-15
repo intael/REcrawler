@@ -1,4 +1,4 @@
-package webcrawlers.spanishestate;
+package webcrawlers.spanishestate.entities;
 
 import realestate.RealEstate;
 import realestate.measures.Price;
@@ -111,9 +111,9 @@ public class SpanishEstateHome extends RealEstate {
 
   /** {@code SpanishEstateHome} builder static inner class. */
   public static final class Builder {
-    private int seNumber;
-    private String seReference;
-    private Price price;
+    private final int seNumber;
+    private final String seReference;
+    private final Price price;
     private String region;
     private String location;
     private String type;
@@ -124,18 +124,29 @@ public class SpanishEstateHome extends RealEstate {
     private String title;
     private String description;
 
-    public Builder(int seNumber, String seReference, Price price, Surface surface) {
+    public Builder(int seNumber, String seReference, Price price) {
       nonNegativeGuard(seNumber, "seNumber");
       this.seNumber = seNumber;
       this.seReference = seReference;
       this.price = price;
-      this.surface = surface;
     }
 
     private void nonNegativeGuard(int argument, String attribute) {
       if (argument < 0)
         throw new IllegalArgumentException(
             String.format("Argument for %s can not be negative!", attribute));
+    }
+
+    /**
+     * Sets the {@code surface} and returns a reference to this Builder so that the methods can be
+     * chained together.
+     *
+     * @param surface the {@code surface} to set
+     * @return a reference to this Builder
+     */
+    public Builder withSurface(Surface surface) {
+      this.surface = surface;
+      return this;
     }
 
     /**
