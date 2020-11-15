@@ -51,4 +51,11 @@ class SpanishEstateSearchUrlBuilderTest {
     assertThrows(
         IllegalArgumentException.class, () -> new SpanishEstateSearchUrlBuilder.Builder(""));
   }
+
+  @Test
+  public void buildUrlWithOptionalsAndWeirdCharactersCreatesExpectedUrl() {
+    assertEquals(
+        "https://www.spanishestate.com/sale/property/province-barcelona/?search=true",
+        instanceWithoutOptionals.buildUrl());
+  }
 }

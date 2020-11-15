@@ -10,21 +10,29 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import realestate.RealEstate;
 import util.TestFilesUtils;
-import webcrawling.HtmlParser;
+import webcrawlers.spanishestate.entities.SpanishEstateHome;
+import webcrawlers.spanishestate.parsing.SpanishEstateFetchUrlsHtmlParser;
+import webcrawlers.spanishestate.parsing.SpanishEstateListingHtmlParser;
+import webcrawling.parsing.HtmlParser;
 
 public class SpanishEstateHtmlParsersTest {
   public static final String DOMAIN = "spanishestate";
   private static final String SEARCH_RESULTS_SAMPLE_FILENAME =
       "search-results-sample-2020-10-27.html";
+  private static final String EMPTY_SEARCH_RESULTS_SAMPLE_FILENAME =
+      "empty-search-results-sample-2020-10-30.html";
   private static final List<String> HOUSE_PAGE_SAMPLES_FILENAMES =
       List.of("home-sample-2020-10-29.html");
   private Document listingsSearchResultPageSample;
+  private Document emptyListingsSearchResultPageSample;
   private final List<Document> housePageSamples = new ArrayList<>();
 
   @BeforeEach
   void setUp() throws IOException {
     this.listingsSearchResultPageSample =
         TestFilesUtils.readAndParseHtmlFile(DOMAIN, SEARCH_RESULTS_SAMPLE_FILENAME);
+    this.emptyListingsSearchResultPageSample =
+        TestFilesUtils.readAndParseHtmlFile(DOMAIN, EMPTY_SEARCH_RESULTS_SAMPLE_FILENAME);
     for (String sample : HOUSE_PAGE_SAMPLES_FILENAMES) {
       housePageSamples.add(TestFilesUtils.readAndParseHtmlFile(DOMAIN, sample));
     }
@@ -34,9 +42,15 @@ public class SpanishEstateHtmlParsersTest {
   void searchPaginationParserReturnsPaginationUrlsGivenASpanishEstateaSearchResultsPage() {
     HtmlParser<URL> searchPaginationParser = new SpanishEstateFetchUrlsHtmlParser();
     List<URL> urlStrings = searchPaginationParser.parse(this.listingsSearchResultPageSample);
-    long expectedPages = 12L;
-    Assert.assertEquals(expectedPages, urlStrings.size());
+    Assert.assertEquals(12L, urlStrings.size());
   }
+  @Test
+  void searchPaginationParserReturnsNoUrlGivenAnEmptySpanishEstateaSearchResultsPage() {
+    HtmlParser<URL> searchPaginationParser = new SpanishEstateFetchUrlsHtmlParser();
+    List<URL> urlStrings = searchPaginationParser.parse(this.emptyListingsSearchResultPageSample);
+    Assert.assertEquals(0, urlStrings.size());
+  }
+
 
   @Test
   void realEstateParserReturnsRealEstateGivenASpanishEstateHousePage() {

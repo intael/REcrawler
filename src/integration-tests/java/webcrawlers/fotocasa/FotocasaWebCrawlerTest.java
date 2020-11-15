@@ -1,5 +1,7 @@
 package webcrawlers.fotocasa;
 
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import java.net.URL;
 import java.util.Locale;
 import org.junit.Assert;
@@ -7,13 +9,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import realestate.RealEstate;
+import webcrawlers.fotocasa.parsing.FotocasaFetchUrlsHtmlParser;
+import webcrawlers.fotocasa.parsing.FotocasaListingHtmlParser;
 import webcrawlers.fotocasa.repositories.FotocasaRealEstateMySqlRepository;
-import webcrawling.HtmlParser;
 import webcrawling.RealEstateRepository;
 import webcrawling.UrlBuilder;
-import webcrawling.repositories.RemoteRestProxyRepository;
-import webcrawling.repositories.ShortListUserAgentRepository;
+import webcrawling.parsing.HtmlParser;
 import webcrawling.site_collectors.GenericSiteCollector;
+import webcrawling.site_collectors.SiteCollector;
+import webcrawling.site_collectors.dependency_injection.GenericSiteCollectorModule;
 
 class FotocasaWebCrawlerTest {
 
@@ -21,11 +25,8 @@ class FotocasaWebCrawlerTest {
 
   @BeforeEach
   void setUp() {
-    GenericSiteCollector siteCollector =
-        new GenericSiteCollector(
-            new ShortListUserAgentRepository(),
-            new RemoteRestProxyRepository(
-                "https://api.proxyscrape.com/?request=getproxies&proxytype=http&timeout=750&country=all&ssl=all&anonymity=all"));
+    Injector injector = Guice.createInjector(new GenericSiteCollectorModule());
+    SiteCollector siteCollector = injector.getInstance(GenericSiteCollector.class);
     HtmlParser<RealEstate> listingHtmlParser = new FotocasaListingHtmlParser();
     HtmlParser<URL> searchResultsPagesHtmlParser =
         new FotocasaFetchUrlsHtmlParser("a.sui-LinkBasic.sui-PaginationBasic-link");
@@ -47,9 +48,9 @@ class FotocasaWebCrawlerTest {
     this.instance.crawl();
     Assert.assertTrue(this.instance.getSearchResultsPages().size() > 0);
     Assert.assertTrue(this.instance.getListingPageUrls().size() > 0);
-    Assert.assertTrue(this.instance.getCollectedHomes().size() > 0);
+    Assert.assertTrue(this.instance.getCollectedRealEstates().size() > 0);
 
     RealEstateRepository repo = new FotocasaRealEstateMySqlRepository();
-    this.instance.getCollectedHomes().forEach(repo::save);
+    this.instance.getCollectedRealEstates().forEach(repo::save);
   }
 }

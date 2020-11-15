@@ -2,21 +2,41 @@ version: '3.3'
 
 services:
   core:
-    build: .
-    container_name: core_scrapper
+    build:
+      dockerfile: docker/Dockerfile
+      context: .
+    container_name: REcrawler
+    environment:
+      - HOST=172.28.1.2
+      - PORT=3306
+      - MYSQL_DATABASE=recrawler
+      - MYSQL_USER=root
+      - MYSQL_ROOT_PASSWORD=passwd
     entrypoint: ["tail", "-f", "/dev/null"]
     volumes:
       - .:/usr/src/app
+    networks:
+      testing_net:
+        ipv4_address: 172.28.1.1
 
   db:
     container_name: db_scrapper
     image: mysql:8.0
     environment:
-      - MYSQL_DATABASE=core
-      - MYSQL_USER=root
+      - MYSQL_DATABASE=recrawler
       - MYSQL_ROOT_PASSWORD=passwd
     ports:
       - 33069:3306
     restart: always
     volumes:
-      - ./docker/mysql:/docker-entrypoint-initdb.d/
+      - ./docker/mysql/scripts:/docker-entrypoint-initdb.d:rw
+    networks:
+      testing_net:
+        ipv4_address: 172.28.1.2
+
+networks:
+  testing_net:
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.28.0.0/16

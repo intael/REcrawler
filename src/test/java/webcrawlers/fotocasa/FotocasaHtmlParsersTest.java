@@ -11,7 +11,9 @@ import org.junit.jupiter.api.Test;
 import realestate.RealEstate;
 import util.TestFilesUtils;
 import webcrawlers.fotocasa.entities.FotocasaHome;
-import webcrawling.HtmlParser;
+import webcrawlers.fotocasa.parsing.FotocasaFetchUrlsHtmlParser;
+import webcrawlers.fotocasa.parsing.FotocasaListingHtmlParser;
+import webcrawling.parsing.HtmlParser;
 
 class FotocasaHtmlParsersTest {
   public static final String DOMAIN = "fotocasa";
