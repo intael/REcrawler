@@ -6,6 +6,7 @@ import org.junit.Assert;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
+import webcrawling.repositories.RemoteRestProxyRepository;
 
 class RemoteRestProxyRepositoryTest {
   private final String PROXY_SCRAPE_ENDPOINT =
@@ -13,7 +14,7 @@ class RemoteRestProxyRepositoryTest {
   private RemoteRestProxyRepository instance;
 
   @BeforeEach
-  void setUp() throws IOException{
+  void setUp() throws IOException {
     this.instance = new RemoteRestProxyRepository(PROXY_SCRAPE_ENDPOINT);
     this.instance.collectProxyList();
   }

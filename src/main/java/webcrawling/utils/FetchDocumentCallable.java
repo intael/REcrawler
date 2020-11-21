@@ -14,9 +14,9 @@ public class FetchDocumentCallable implements Callable<Optional<Document>> {
   private static final Logger LOGGER = LoggerFactory.getLogger(FetchDocumentCallable.class);
   private final String url;
   private final int retries;
-  private SiteCollector siteCollector;
-  private Map<String, String> headers;
-  private Map<String, String> cookies;
+  private final SiteCollector siteCollector;
+  private final Map<String, String> headers;
+  private final Map<String, String> cookies;
 
   public FetchDocumentCallable(
       @NotNull String url,
