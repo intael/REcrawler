@@ -3,7 +3,6 @@ package webcrawlers.spanishestate;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -19,7 +18,6 @@ import java.util.concurrent.Future;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import org.jsoup.Connection;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -106,18 +104,11 @@ public class SpanishEstateWebCrawler implements WebCrawler {
   @Override
   public void crawl() {
     reloadCookies(defaultCookies, defaultHeaders);
-    String searchUrl = urlBuilder.buildUrl();
     Document currentSearchResultsPage;
-    currentSearchResultsPage = fetchSearchResultsPage(searchUrl, defaultCookies, defaultHeaders);
-    if (currentSearchResultsPage == null) {
-      return;
-    }
-    List<URL> searchResultPages =
-        new ArrayList<>(searchResultsPageParser.parse(currentSearchResultsPage));
-    searchResultsPages.addAll(searchResultPages);
-    int page = 2;
-    LOGGER.info("All good, starting to collect search result pages.");
-    while (page <= 5 && !searchResultPages.isEmpty()) {
+    List<URL> searchResultPages = List.of();
+    int page = 1;
+    LOGGER.info("Starting to collect search result pages.");
+    while (page == 1 || !searchResultPages.isEmpty()) {
       String newSearchResultsPageUrl = urlBuilder.buildUrl(page);
       LOGGER.info("----------------");
       LOGGER.info("Search Results page: " + page);
@@ -138,7 +129,6 @@ public class SpanishEstateWebCrawler implements WebCrawler {
     collectPagesConcurrently(searchResultsPages, this::getHome);
   }
 
-  @Nullable
   private Document fetchSearchResultsPage(
       String searchUrl, Map<String, String> cookies, Map<String, String> headers) {
     int cookieRotationAttempts = 0;
@@ -158,7 +148,7 @@ public class SpanishEstateWebCrawler implements WebCrawler {
       }
     }
     System.exit(1);
-    LOGGER.error("Initial search results failed. Exiting.");
+    LOGGER.error("Search results attempts failed. Giving up :(");
     return null;
   }
 
