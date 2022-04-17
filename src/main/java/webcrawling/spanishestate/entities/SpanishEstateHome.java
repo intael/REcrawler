@@ -1,4 +1,4 @@
-package webcrawlers.spanishestate.entities;
+package webcrawling.spanishestate.entities;
 
 import realestate.RealEstate;
 import realestate.measures.Price;

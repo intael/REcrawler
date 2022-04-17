@@ -1,4 +1,4 @@
-package webcrawlers.spanishestate.parsing;
+package webcrawling.spanishestate.parsing;
 
 import java.net.URL;
 import java.util.List;
@@ -16,8 +16,13 @@ public class SpanishEstateFetchUrlsHtmlParser implements HtmlParser<URL> {
   public List<URL> parse(@NotNull Document document) {
     Elements listingSearchResultsContainers = document.select(LISTING_CONTAINER_CSS_SELECTOR);
     return listingSearchResultsContainers.stream()
-        .map((element -> element.selectFirst(A_HTML_TAG).absUrl(HREF_ATTRIBUTE)))
-        .filter((string) -> !string.contains(AD_URL_SUBSTRING) && !string.contains("/homes-p/"))
+        .map((element -> element.selectFirst(A_HTML_TAG).attr(HREF_ATTRIBUTE)))
+        .filter(
+            (string) ->
+                !string.contains(AD_URL_SUBSTRING)
+                    && !string.contains("/homes-p/")
+                    && string.length() > 0)
+        .map((url) -> "https://www.spanishestate.com" + url)
         .map(HtmlParser::deserializeUrl)
         .distinct()
         .collect(Collectors.toList());
