@@ -3,20 +3,22 @@ package webcrawlers.spanishestate;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.net.URL;
-import org.junit.Assert;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.EnabledIfEnvironmentVariable;
 import realestate.RealEstate;
-import webcrawlers.spanishestate.parsing.SpanishEstateFetchUrlsHtmlParser;
-import webcrawlers.spanishestate.parsing.SpanishEstateListingHtmlParser;
-import webcrawlers.spanishestate.repositories.SpanishEstateHomeMySqlRepository;
 import webcrawling.RealEstateRepository;
 import webcrawling.UrlBuilder;
 import webcrawling.parsing.HtmlParser;
-import webcrawling.site_collectors.GenericSiteCollector;
+import webcrawling.site_collectors.PlaywrightSiteCollector;
 import webcrawling.site_collectors.SiteCollector;
-import webcrawling.site_collectors.dependency_injection.GenericSiteCollectorModule;
+import webcrawling.site_collectors.dependency_injection.PlaywrightSiteCollectorModule;
+import webcrawling.spanishestate.SpanishEstateSearchUrlBuilder;
+import webcrawling.spanishestate.SpanishEstateWebCrawler;
+import webcrawling.spanishestate.parsing.SpanishEstateFetchUrlsHtmlParser;
+import webcrawling.spanishestate.parsing.SpanishEstateListingHtmlParser;
+import webcrawling.spanishestate.repositories.SpanishEstateHomeMySqlRepository;
 
 class SpanishEstateWebCrawlerTest {
 
@@ -24,8 +26,8 @@ class SpanishEstateWebCrawlerTest {
 
   @BeforeEach
   void setUp() {
-    Injector injector = Guice.createInjector(new GenericSiteCollectorModule());
-    SiteCollector siteCollector = injector.getInstance(GenericSiteCollector.class);
+    Injector injector = Guice.createInjector(new PlaywrightSiteCollectorModule());
+    SiteCollector siteCollector = injector.getInstance(PlaywrightSiteCollector.class);
     HtmlParser<RealEstate> listingHtmlParser = new SpanishEstateListingHtmlParser();
     HtmlParser<URL> searchResultsPagesHtmlParser = new SpanishEstateFetchUrlsHtmlParser();
     UrlBuilder urlBuilder =
@@ -45,7 +47,7 @@ class SpanishEstateWebCrawlerTest {
     this.instance.crawl();
     System.out.println("Collected Home URLs: " + instance.getSearchResultsPages().size());
     System.out.println("Collected homes: " + instance.getCollectedRealEstates().size());
-    Assert.assertTrue(this.instance.getCollectedRealEstates().size() > 0);
+    Assertions.assertTrue(this.instance.getCollectedRealEstates().size() > 0);
     RealEstateRepository repository = new SpanishEstateHomeMySqlRepository();
     this.instance.getCollectedRealEstates().forEach(repository::save);
   }

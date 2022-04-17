@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import realestate.measures.Price;
+import webcrawling.spanishestate.SpanishEstateSearchUrlBuilder;
 import webcrawling.specification.PriceRange;
 
 class SpanishEstateSearchUrlBuilderTest {

@@ -1,4 +1,4 @@
-package webcrawlers.spanishestate;
+package webcrawling.spanishestate;
 
 import java.net.URISyntaxException;
 import java.util.ArrayList;

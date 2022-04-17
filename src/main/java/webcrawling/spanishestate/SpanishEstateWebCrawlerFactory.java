@@ -1,13 +1,13 @@
-package webcrawlers.spanishestate;
+package webcrawling.spanishestate;
 
 import com.google.inject.Guice;
-import webcrawlers.spanishestate.parsing.SpanishEstateFetchUrlsHtmlParser;
-import webcrawlers.spanishestate.parsing.SpanishEstateListingHtmlParser;
 import webcrawling.UrlBuilder;
 import webcrawling.WebCrawler;
-import webcrawling.site_collectors.GenericSiteCollector;
+import webcrawling.site_collectors.PlaywrightSiteCollector;
 import webcrawling.site_collectors.SiteCollector;
-import webcrawling.site_collectors.dependency_injection.GenericSiteCollectorModule;
+import webcrawling.site_collectors.dependency_injection.PlaywrightSiteCollectorModule;
+import webcrawling.spanishestate.parsing.SpanishEstateFetchUrlsHtmlParser;
+import webcrawling.spanishestate.parsing.SpanishEstateListingHtmlParser;
 
 public class SpanishEstateWebCrawlerFactory {
   private final UrlBuilder urlBuilder;
@@ -18,8 +18,8 @@ public class SpanishEstateWebCrawlerFactory {
 
   public WebCrawler build() {
     SiteCollector siteCollector =
-        Guice.createInjector(new GenericSiteCollectorModule())
-            .getInstance(GenericSiteCollector.class);
+        Guice.createInjector(new PlaywrightSiteCollectorModule())
+            .getInstance(PlaywrightSiteCollector.class);
     return new SpanishEstateWebCrawler(
         siteCollector,
         new SpanishEstateListingHtmlParser(),

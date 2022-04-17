@@ -1,4 +1,4 @@
-package webcrawlers.spanishestate.parsing;
+package webcrawling.spanishestate.parsing;
 
 import java.text.NumberFormat;
 import java.text.ParseException;
@@ -17,8 +17,8 @@ import realestate.RealEstate;
 import realestate.measures.Price;
 import realestate.measures.Surface;
 import webcrawlers.fotocasa.RequiredFieldNotFound;
-import webcrawlers.spanishestate.entities.SpanishEstateHome;
 import webcrawling.parsing.HtmlParser;
+import webcrawling.spanishestate.entities.SpanishEstateHome;
 
 public class SpanishEstateListingHtmlParser implements HtmlParser<RealEstate> {
 

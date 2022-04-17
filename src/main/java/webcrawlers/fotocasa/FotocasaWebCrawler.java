@@ -1,7 +1,6 @@
 package webcrawlers.fotocasa;
 
 import java.net.URL;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -31,7 +30,6 @@ import webcrawling.utils.IndexedUrl;
 public class FotocasaWebCrawler implements WebCrawler {
   private static final Logger LOGGER = LoggerFactory.getLogger(FotocasaWebCrawler.class);
   private static final Pattern SEARCH_RESULTS_URL_INDEX_REGEX = Pattern.compile("[0-9]+$");
-  private static final int SEARCH_RESULTS_DEFAULT_RETRY_TIMES = 30;
   private final Set<URL> searchResultsPages = new HashSet<>();
   private final Set<URL> listingPageUrls = ConcurrentHashMap.newKeySet();
   private final Set<RealEstate> collectedHomes = ConcurrentHashMap.newKeySet();
@@ -70,13 +68,7 @@ public class FotocasaWebCrawler implements WebCrawler {
   public void crawl() {
     String searchUrl = urlBuilder.buildUrl();
     Optional<Document> initialSearchResult =
-        new FetchDocumentCallable(
-                searchUrl,
-                siteCollector,
-                SEARCH_RESULTS_DEFAULT_RETRY_TIMES,
-                new HashMap<>(),
-                new HashMap<>())
-            .call();
+        new FetchDocumentCallable(searchUrl, siteCollector).call();
     if (initialSearchResult.isEmpty()) {
       LOGGER.error("Failed to even fetch the initial search results page.");
       return;
@@ -133,12 +125,7 @@ public class FotocasaWebCrawler implements WebCrawler {
       LOGGER.debug("Total search results pages collected: " + searchResultsPages.size());
       LOGGER.info("Highest indexed url: " + highestIndexPage.getUrl());
       Document page =
-          new FetchDocumentCallable(
-                  highestIndexPage.getUrl().toString(),
-                  siteCollector,
-                  SEARCH_RESULTS_DEFAULT_RETRY_TIMES,
-                  new HashMap<>(),
-                  new HashMap<>())
+          new FetchDocumentCallable(highestIndexPage.getUrl().toString(), siteCollector)
               .call()
               .orElseThrow(
                   () ->
@@ -155,14 +142,7 @@ public class FotocasaWebCrawler implements WebCrawler {
     List<Future<Optional<Document>>> futures;
     List<Callable<Optional<Document>>> callables =
         pages.stream()
-            .map(
-                (url) ->
-                    new FetchDocumentCallable(
-                        url.toString(),
-                        siteCollector,
-                        SEARCH_RESULTS_DEFAULT_RETRY_TIMES,
-                        new HashMap<>(),
-                        new HashMap<>()))
+            .map((url) -> new FetchDocumentCallable(url.toString(), siteCollector))
             .collect(Collectors.toList());
     try {
       futures = executorService.invokeAll(callables);

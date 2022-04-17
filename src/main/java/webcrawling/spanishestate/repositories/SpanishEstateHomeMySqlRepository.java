@@ -1,4 +1,4 @@
-package webcrawlers.spanishestate.repositories;
+package webcrawling.spanishestate.repositories;
 
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -8,8 +8,8 @@ import java.sql.Types;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import realestate.RealEstate;
-import webcrawlers.spanishestate.entities.SpanishEstateHome;
 import webcrawling.RealEstateRepository;
+import webcrawling.spanishestate.entities.SpanishEstateHome;
 
 public class SpanishEstateHomeMySqlRepository implements RealEstateRepository {
   public static final String HOST = "HOST";

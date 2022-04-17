@@ -10,10 +10,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import realestate.RealEstate;
 import util.TestFilesUtils;
-import webcrawlers.spanishestate.entities.SpanishEstateHome;
-import webcrawlers.spanishestate.parsing.SpanishEstateFetchUrlsHtmlParser;
-import webcrawlers.spanishestate.parsing.SpanishEstateListingHtmlParser;
 import webcrawling.parsing.HtmlParser;
+import webcrawling.spanishestate.entities.SpanishEstateHome;
+import webcrawling.spanishestate.parsing.SpanishEstateFetchUrlsHtmlParser;
+import webcrawling.spanishestate.parsing.SpanishEstateListingHtmlParser;
 
 public class SpanishEstateHtmlParsersTest {
   public static final String DOMAIN = "spanishestate";
@@ -44,13 +44,13 @@ public class SpanishEstateHtmlParsersTest {
     List<URL> urlStrings = searchPaginationParser.parse(this.listingsSearchResultPageSample);
     Assert.assertEquals(12L, urlStrings.size());
   }
+
   @Test
   void searchPaginationParserReturnsNoUrlGivenAnEmptySpanishEstateaSearchResultsPage() {
     HtmlParser<URL> searchPaginationParser = new SpanishEstateFetchUrlsHtmlParser();
     List<URL> urlStrings = searchPaginationParser.parse(this.emptyListingsSearchResultPageSample);
     Assert.assertEquals(0, urlStrings.size());
   }
-
 
   @Test
   void realEstateParserReturnsRealEstateGivenASpanishEstateHousePage() {
