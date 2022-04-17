@@ -30,3 +30,7 @@ hs_err_pid*
 .idea/
 .DS_Store
 *.iml
+
+# maven stuff
+
+dependency-reduced-pom.xml
