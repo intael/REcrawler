@@ -22,9 +22,9 @@ public class Main {
   private static final String GEOAREA3_SHORT_NAME = "g3";
   private static final String MIN_BATHROOMS = "minBathrooms";
   private static final String MIN_ROOMS = "minRooms";
+  private static Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
   public static void main(String[] args) throws Exception {
-    Logger LOGGER = LoggerFactory.getLogger(Main.class);
     new CmdLineAppBuilder(args)
         .withJarName("REcrawler") // just for a help text (-h option)
         .withDescription("My program does ...")
@@ -62,6 +62,7 @@ public class Main {
         .withEntryPoint(Main::run)
         .build()
         .run();
+    System.exit(0);
   }
 
   private static void run(CommandLine commandLine) {
@@ -71,12 +72,14 @@ public class Main {
     switch (selectedSite) {
       default:
         UrlBuilder urlBuilder = createSearchUrlBuilder(selectedSite, commandLine);
-        realEstateRepository = new SpanishEstateHomeMySqlRepository(); // temporarily coupled here
+        realEstateRepository = new SpanishEstateHomeMySqlRepository();
         crawler = new SpanishEstateWebCrawlerFactory(urlBuilder).build();
         break;
     }
     crawler.crawl();
+    LOGGER.info("Crawling finalized successfully! Persisting data...");
     crawler.getCollectedRealEstates().forEach(realEstateRepository::save);
+    LOGGER.info("Data persisted successfully!");
   }
 
   private static UrlBuilder createSearchUrlBuilder(Site site, CommandLine commandLineApp) {

@@ -5,6 +5,8 @@ import com.google.inject.name.Named;
 import com.microsoft.playwright.*;
 import java.io.IOException;
 import java.util.Optional;
+
+import com.microsoft.playwright.options.LoadState;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -14,32 +16,33 @@ import webcrawling.site_collectors.dependency_injection.LaunchOptionsQualifier;
 public class PlaywrightSiteCollector implements SiteCollector {
   private static final Logger LOGGER = LoggerFactory.getLogger(PlaywrightSiteCollector.class);
   private final int maxRetries;
-  private final BrowserType.LaunchOptions launchOptions;
+  private final Browser browser;
 
   @Inject
   public PlaywrightSiteCollector(
       @LaunchOptionsQualifier BrowserType.LaunchOptions launchOptions,
       @Named("maxRetries") int maxRetries) {
     this.maxRetries = maxRetries;
-    this.launchOptions = launchOptions;
+    this.browser = Playwright.create().chromium().launch(launchOptions);
   }
 
   @Override
   public Optional<Document> collect(String url) {
-    int retries = 0;
+    var retries = 0;
     while (retries <= maxRetries) {
-      try (Browser browser = Playwright.create().chromium().launch(launchOptions);
-          Page page = browser.newPage()) {
+      try (Page page = browser.newPage()) {
         Response response = page.navigate(url);
+        page.waitForLoadState(LoadState.DOMCONTENTLOADED);
         if (response.status() != 200) {
           throw new IOException("Response is not 200.");
         }
         return Optional.of(Jsoup.parse(response.text()));
-      } catch (IOException ioe) {
+      } catch (IOException | PlaywrightException ioe) {
         LOGGER.info("Failed to collect url: " + url + ioe.getMessage() + " Retrying.");
         retries++;
       }
     }
+    LOGGER.warn("Giving up on retries for " + url);
     return Optional.empty();
   }
 }
