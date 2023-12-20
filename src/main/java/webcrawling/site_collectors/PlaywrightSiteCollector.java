@@ -27,7 +27,7 @@ public class PlaywrightSiteCollector implements SiteCollector {
   }
 
   @Override
-  synchronized public Optional<Document> collect(String url) {
+  public Optional<Document> collect(String url) {
     var retries = 0;
     while (retries <= maxRetries) {
       try (Page page = browser.newPage()) {

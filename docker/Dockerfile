@@ -1,4 +1,4 @@
-FROM maven:3.9.5-amazoncorretto-17-debian-bookworm
+FROM maven:3.9.6-amazoncorretto-21-debian-bookworm
 
 RUN apt update && apt upgrade -y
 

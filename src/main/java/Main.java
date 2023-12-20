@@ -72,7 +72,7 @@ public class Main {
     switch (selectedSite) {
       default:
         UrlBuilder urlBuilder = createSearchUrlBuilder(selectedSite, commandLine);
-        realEstateRepository = new SpanishEstateHomeMySqlRepository(); // temporarily coupled here
+        realEstateRepository = new SpanishEstateHomeMySqlRepository();
         crawler = new SpanishEstateWebCrawlerFactory(urlBuilder).build();
         break;
     }
