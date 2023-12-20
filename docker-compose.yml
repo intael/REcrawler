@@ -1,13 +1,13 @@
-version: '3.3'
+version: '3.8'
 
 services:
   core:
     build:
       dockerfile: docker/Dockerfile
       context: .
-    container_name: REcrawler
+    container_name: recrawler
     environment:
-      - HOST=172.28.1.2
+      - HOST=db
       - PORT=3306
       - MYSQL_DATABASE=recrawler
       - MYSQL_USER=root
@@ -15,28 +15,17 @@ services:
     entrypoint: ["tail", "-f", "/dev/null"]
     volumes:
       - .:/usr/src/app
-    networks:
-      testing_net:
-        ipv4_address: 172.28.1.1
+    depends_on: ["db"]
 
   db:
     container_name: db_scrapper
-    image: mysql:8.0
+    image: mysql:8.0.35
+    platform: linux/amd64
     environment:
       - MYSQL_DATABASE=recrawler
       - MYSQL_ROOT_PASSWORD=passwd
     ports:
-      - 33069:3306
+      - 3306:3306
     restart: always
     volumes:
       - ./docker/mysql/scripts:/docker-entrypoint-initdb.d:rw
-    networks:
-      testing_net:
-        ipv4_address: 172.28.1.2
-
-networks:
-  testing_net:
-    ipam:
-      driver: default
-      config:
-        - subnet: 172.28.0.0/16
